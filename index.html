@@ -1,503 +1,503 @@
-     1|<!DOCTYPE html>
-     2|<html lang="nl">
-     3|<head>
-     4|<meta charset="UTF-8">
-     5|<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-     6|<title>ryan-the-zilla.github.io</title>
-     7|<style>
-     8|*{margin:0;padding:0;box-sizing:border-box}
-     9|html,body{overflow:hidden;height:100%;-webkit-text-size-adjust:100%}
-    10|body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;background:#fff}
-    11|
-    12|/* === SAFARI ERROR === */
-    13|.safari{
-    14|  position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;
-    15|  display:flex;flex-direction:column;align-items:center;justify-content:center;
-    16|  text-align:center;padding:40px 24px;color:#1d1d1f;z-index:1;
-    17|}
-    18|.safari.hidden{display:none}
-    19|.sf-emoji{font-size:48px;margin-bottom:14px;opacity:0.65}
-    20|.sf-h{font-size:17px;font-weight:600;color:#1d1d1f;margin-bottom:2px;letter-spacing:-0.2px}
-    21|.sf-url{font-size:13px;color:#8e8e93;margin-bottom:18px}
-    22|.sf-code{font-size:12px;color:#8e8e93;font-family:'SF Mono',Menlo,monospace;margin-bottom:4px}
-    23|.sf-body{font-size:14px;color:#8e8e93;line-height:1.5;max-width:360px}
-    24|.sf-body strong{color:#1d1d1f;font-weight:500}
-    25|.sf-foot{margin-top:20px;font-size:11px;color:#c7c7cc;font-family:'SF Mono',Menlo,monospace}
-    26|
-    27|/* Reload button */
-    28|.sf-reload{
-    29|  margin-top:24px;padding:10px 28px;font-size:15px;font-family:inherit;
-    30|  background:#007aff;color:#fff;border:none;border-radius:10px;
-    31|  cursor:pointer;font-weight:500;letter-spacing:-0.2px;
-    32|  transition:background 0.15s,transform 0.1s;
-    33|}
-    34|.sf-reload:active{background:#0062d1;transform:scale(0.97)}
-    35|
-    36|/* Loading spinner */
-    37|.sf-spinner{
-    38|  display:none;margin-top:20px;
-    39|  width:24px;height:24px;border:2.5px solid #e5e5ea;border-top-color:#007aff;
-    40|  border-radius:50%;animation:spin 0.8s linear infinite;
-    41|}
-    42|.sf-spinner.show{display:inline-block}
-    43|@keyframes spin{to{transform:rotate(360deg)}}
-    44|@keyframes faahPulse{0%{transform:scale(0.3);opacity:0}50%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:1}}
-    45|@keyframes photoZoom{0%{transform:scale(0.2) rotate(-5deg);opacity:0}60%{transform:scale(1.1) rotate(2deg);opacity:1}100%{transform:scale(1) rotate(0deg)}}
-    46|
-    47|.sf-h.glitch{animation:gl 0.25s ease}
-    48|@keyframes gl{0%{transform:translate(0)}20%{transform:translate(-2px,1px);opacity:0.7}50%{transform:translate(2px,-1px);opacity:0.9}80%{transform:translate(-1px,1px)}100%{transform:translate(0);opacity:1}}
-    49|.shake{animation:sk 0.35s ease}
-    50|@keyframes sk{0%,100%{transform:translate(0)}15%{transform:translate(-3px,2px)}35%{transform:translate(3px,-2px)}55%{transform:translate(-2px,1px)}75%{transform:translate(2px,-1px)}}
-    51|
-    52|/* === iOS ALERT === */
-    53|.alert-bg{
-    54|  display:none;position:fixed;top:0;left:0;width:100%;height:100%;
-    55|  background:rgba(0,0,0,0.32);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-    56|  z-index:50;align-items:center;justify-content:center;padding:20px;
-    57|}
-    58|.alert-bg.show{display:flex}
-    59|
-    60|.alert-box{
-    61|  background:rgba(255,255,255,0.98);border-radius:14px;width:100%;max-width:270px;
-    62|  overflow:hidden;animation:aIn 0.22s cubic-bezier(0.36,0.66,0.5,1);
-    63|  box-shadow:0 20px 60px rgba(0,0,0,0.2),0 0 0 0.5px rgba(0,0,0,0.08);
-    64|}
-    65|@keyframes aIn{from{transform:scale(1.08);opacity:0}to{transform:scale(1);opacity:1}}
-    66|
-    67|.alert-top{padding:20px 16px 16px;text-align:center}
-    68|.alert-icon{font-size:36px;margin-bottom:8px;line-height:1}
-    69|.alert-title{font-size:13px;font-weight:600;color:#1d1d1f;margin-bottom:4px;letter-spacing:-0.1px}
-    70|.alert-desc{font-size:12px;color:#8e8e93;line-height:1.45}
-    71|.alert-desc strong{color:#1d1d1f;font-weight:500}
-    72|.alert-desc .red{color:#ff3b30;font-weight:500}
-    73|.alert-desc .gray{color:#aeaeb2}
-    74|
-    75|.alert-divider{height:0.5px;background:rgba(60,60,67,0.12);margin:0}
-    76|
-    77|.alert-buttons{display:flex;flex-direction:column}
-    78|.alert-btn{
-    79|  width:100%;padding:11px 16px;font-size:13px;font-family:inherit;
-    80|  border:none;background:none;cursor:pointer;text-align:center;
-    81|  letter-spacing:-0.1px;transition:background 0.12s;
-    82|}
-    83|.alert-btn:active{background:rgba(0,0,0,0.06)}
-    84|.alert-btn.bold{font-weight:600;color:#007aff}
-    85|.alert-btn.red{font-weight:600;color:#ff3b30}
-    86|.alert-btn:disabled{color:#c7c7cc;pointer-events:none}
-    87|
-    88|.alert-progress{padding:0 16px 14px;display:none}
-    89|.alert-progress.show{display:block}
-    90|.ap-track{width:100%;height:3px;background:#e5e5ea;border-radius:1.5px;overflow:hidden}
-    91|.ap-fill{height:100%;background:#007aff;border-radius:1.5px;width:0%;transition:width 0.3s}
-    92|.ap-text{font-size:11px;color:#8e8e93;margin-top:7px;text-align:center}
-    93|
-    94|/* Stop btn — hidden until enabled */
-    95|.alert-stop{display:none;padding:0 16px 12px;text-align:center}
-    96|.alert-stop.show{display:block}
-    97|.alert-stop-btn{
-    98|  font-size:11px;font-family:inherit;color:#8e8e93;border:none;background:none;
-    99|  cursor:pointer;padding:4px 12px;transition:color 0.2s;
-   100|}
-   101|.alert-stop-btn:active{color:#636366}
-   102|.alert-stop-btn:disabled{color:#d1d1d6;pointer-events:none}
-   103|
-   104|/* Blocked popup */
-   105|.blocked-box{max-width:240px}
-   106|
-   107|/* Reveal — same alert box, warm shift */
-   108|.alert-box.warm{
-   109|  background:rgba(255,252,245,0.98);
-   110|  box-shadow:0 20px 60px rgba(180,140,40,0.15),0 0 0 0.5px rgba(180,140,40,0.1);
-   111|}
-   112|.warm .alert-title{color:#8b6914}
-   113|.warm .alert-desc{color:#6b5d4d}
-   114|.warm .alert-desc .gold{color:#b8922e;font-weight:600}
-   115|.warm .alert-desc .sincere{color:#3d3529;font-style:italic}
-   116|.warm .alert-btn{color:#b8922e}
-   117|
-   118|.confetti{position:fixed;top:-10px;z-index:201;pointer-events:none;animation:cF linear forwards}
-   119|@keyframes cF{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
-   120|
-   121|@media(max-width:600px){
-   122|  .alert-box{max-width:85%}
-   123|}
-   124|</style>
-   125|</head>
-   126|<body>
-   127|
-   128|<!-- Safari Error -->
-   129|<div class="safari" id="safari">
-   130|  <div class="sf-emoji" id="sfE">😕</div>
-   131|  <div class="sf-h" id="sfH">Deze site kan niet worden bereikt</div>
-   132|  <div class="sf-url">ryan-the-zilla.github.io</div>
-   133|  <div class="sf-code" id="sfC">ERR_CONNECTION_REFUSED</div>
-   134|  <div class="sf-body" id="sfB"><strong>ryan-the-zilla.github.io</strong> heeft de verbinding geweigerd.</div>
-   135|  <div class="sf-foot" id="sfF">Foutdetails: CONNECTION_REFUSED — Poort 443</div>
-   136|  <div class="sf-spinner" id="sfSpin"></div>
-   137|  <button class="sf-reload" id="reloadBtn" onclick="startMorph()">Probeer opnieuw</button>
-   138|</div>
-   139|
-   140|<!-- Alert 1: Confirm delete -->
-   141|<div class="alert-bg" id="a1">
-   142|  <div class="alert-box">
-   143|    <div class="alert-top">
-   144|      <div class="alert-icon">🗑️</div>
-   145|      <div class="alert-title">Ryany verwijderen?</div>
-   146|      <div class="alert-desc">
-   147|        Weet je zeker dat je <strong>Ryany</strong> uit het systeem wilt verwijderen?<br><br>
-   148|        Soort: <strong>Zus (19)</strong><br>
-   149|        Rol: <strong>Liefste zus ter wereld</strong><br><br>
-   150|        <span class="red">Deze actie kan niet ongedaan worden gemaakt.</span>
-   151|      </div>
-   152|    </div>
-   153|    <div class="alert-divider"></div>
-   154|    <div class="alert-buttons">
-   155|      <button class="alert-btn red" onclick="startDelete()">Verwijderen</button>
-   156|      <div class="alert-divider"></div>
-   157|      <button class="alert-btn bold" onclick="cancelDelete()">Annuleren</button>
-   158|    </div>
-   159|  </div>
-   160|</div>
-   161|
-   162|<!-- Alert 2: Cancelled calm -->
-   163|<div class="alert-bg" id="a2">
-   164|  <div class="alert-box">
-   165|    <div class="alert-top">
-   166|      <div class="alert-icon" id="a2Icon">✅</div>
-   167|      <div class="alert-title">Geannuleerd</div>
-   168|      <div class="alert-desc" id="a2Text"><strong>Ryany</strong> wordt niet verwijderd.<br>Goede keuze.</div>
-   169|    </div>
-   170|    <div class="alert-divider"></div>
-   171|    <div class="alert-buttons">
-   172|      <button class="alert-btn bold" id="a2Btn" onclick="void(0)">OK</button>
-   173|    </div>
-   174|  </div>
-   175|</div>
-   176|
-   177|<!-- Alert 2b: System override -->
-   178|<div class="alert-bg" id="a2b">
-   179|  <div class="alert-box">
-   180|    <div class="alert-top">
-   181|      <div class="alert-icon">⚠️</div>
-   182|      <div class="alert-title">Systeemwaarschuwing</div>
-   183|      <div class="alert-desc">
-   184|        Je drukte op annuleren, maar <strong>Ryany</strong> heeft een beveiligingsstatus.<br>
-   185|        <span class="gray">Verwijdering wordt uitgevoerd.</span>
-   186|      </div>
-   187|    </div>
-   188|    <div class="alert-progress show">
-   189|      <div class="ap-track"><div class="ap-fill" id="pbar"></div></div>
-   190|      <div class="ap-text" id="pLbl">Voorbereiden...</div>
-   191|    </div>
-   192|    <div class="alert-stop" id="stopA">
-   193|      <button class="alert-stop-btn" id="stopBtn" onclick="tryStop()">Annuleren</button>
-   194|    </div>
-   195|  </div>
-   196|</div>
-   197|
-   198|<!-- Alert 3: Delete progress -->
-   199|<div class="alert-bg" id="a3">
-   200|  <div class="alert-box">
-   201|    <div class="alert-top">
-   202|      <div class="alert-icon">🗑️</div>
-   203|      <div class="alert-title">Bezig met verwijderen...</div>
-   204|      <div class="alert-desc"><strong>Ryany</strong> wordt permanent verwijderd.<br><span class="red">Sluit dit venster niet.</span></div>
-   205|    </div>
-   206|    <div class="alert-progress show">
-   207|      <div class="ap-track"><div class="ap-fill" id="pbar3"></div></div>
-   208|      <div class="ap-text" id="pLbl3">Voorbereiden...</div>
-   209|    </div>
-   210|    <div class="alert-stop" id="stopA3">
-   211|      <button class="alert-stop-btn" id="stopBtn3" onclick="tryStop3()">Annuleren</button>
-   212|    </div>
-   213|  </div>
-   214|</div>
-   215|
-   216|<!-- Alert 4: Blocked popup -->
-   217|<div class="alert-bg" id="a4" style="z-index:60">
-   218|  <div class="alert-box blocked-box">
-   219|    <div class="alert-top">
-   220|      <div class="alert-icon">🚫</div>
-   221|      <div class="alert-title">Verwijdering blokkeren</div>
-   222|      <div class="alert-desc" id="a4Text">Je mag dit proces niet stoppen.</div>
-   223|    </div>
-   224|    <div class="alert-divider"></div>
-   225|    <div class="alert-buttons">
-   226|      <button class="alert-btn bold" onclick="closeBlocked()">OK</button>
-   227|    </div>
-   228|  </div>
-   229|</div>
-   230|
-   231|<!-- Alert 5: Reveal (same box, warm) -->
-   232|<div class="alert-bg" id="a5">
-   233|  <div class="alert-box warm" id="a5box">
-   234|    <div class="alert-top">
-   235|      <div class="alert-icon">🏆</div>
-   236|      <div class="alert-title">Verwijdering mislukt.</div>
-   237|      <div class="alert-desc" id="rText"></div>
-   238|    </div>
-   239|    <div class="alert-divider"></div>
-   240|    <div class="alert-buttons">
-   241|      <button class="alert-btn bold" id="trapBtn" onclick="trapClick()">Verrassing ❤️</button>
-   242|    </div>
-   243|  </div>
-   244|</div>
-   245|
-   246|<script>
-   247|// === SOUND ===
-   248|const AC=window.AudioContext||window.webkitAudioContext;let ax;
-   249|function ia(){if(!ax)ax=new AC()}
-   250|function bp(f,d,t='square',v=0.07){if(!ax)return;const o=ax.createOscillator(),g=ax.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(ax.destination);o.start();g.gain.exponentialRampToValueAtTime(0.001,ax.currentTime+d/1000);o.stop(ax.currentTime+d/1000)}
-   251|function sGl(){bp(150+Math.random()*100,55,'sawtooth',0.05)}
-   252|function sDlg(){bp(400,50,'sine',0.05)}
-   253|function sCan(){bp(600,70,'sine',0.07);setTimeout(()=>bp(800,50,'sine',0.05),80)}
-   254|function sUn(){bp(300,160,'sawtooth',0.04)}
-   255|function sPr(){bp(500+Math.random()*200,35,'sine',0.03)}
-   256|function sWr(){bp(250,100,'sawtooth',0.06)}
-   257|function sFl(){for(let i=0;i<3;i++)setTimeout(()=>bp(300-i*60,50,'square',0.07),i*70)}
-   258|function sPa(){bp(800,40,'square',0.09)}
-   259|function sRv(){bp(523,70,'sine',0.09);setTimeout(()=>bp(659,70,'sine',0.09),90);setTimeout(()=>bp(784,90,'sine',0.11),180);setTimeout(()=>bp(1047,100,'sine',0.13),280)}
-   260|function sTr(){bp(200,50,'square',0.05)}
-   261|function sPs(){bp(200,250,'sine',0.025)}
-   262|function sMr(){for(let i=0;i<4;i++)setTimeout(()=>bp(200+i*80,45,'sawtooth',0.035),i*50)}
-   263|document.addEventListener('click',ia,{once:true});document.addEventListener('touchstart',ia,{once:true});document.addEventListener('keydown',ia,{once:true});
-   264|
-   265|function showA(id){document.querySelectorAll('.alert-bg').forEach(o=>o.classList.remove('show'));document.getElementById(id).classList.add('show')}
-   266|function hideA(id){document.getElementById(id).classList.remove('show')}
-   267|
-   268|// === MORPH TRIGGER (auto + manual) ===
-   269|let morphStarted=false;
-   270|function startMorph(){
-   271|  if(morphStarted)return;
-   272|  morphStarted=true;
-   273|  const spin=document.getElementById('sfSpin');
-   274|  spin.classList.add('show');
-   275|  setTimeout(runErrorMorph,1500);
-   276|}
-   277|// Auto-start after 2.5s regardless — reload button stays visible as excuse
-   278|setTimeout(startMorph,2500);
-   279|
-   280|// === ERROR MORPH ===
-   281|async function glitch(id){const e=document.getElementById(id);e.classList.add('glitch');sGl();await new Promise(r=>setTimeout(r,250));e.classList.remove('glitch')}
-   282|
-   283|async function runErrorMorph(){
-   284|  const t=document.getElementById('sfH'),c=document.getElementById('sfC'),
-   285|    b=document.getElementById('sfB'),f=document.getElementById('sfF'),
-   286|    ic=document.getElementById('sfE'),sp=document.getElementById('sfSpin');
-   287|
-   288|  sp.classList.remove('show');
-   289|  const rb=document.getElementById('reloadBtn');
-   290|  if(rb)rb.style.display='none';
-   291|
-   292|  // Still looks like error... then micro-glitch
-   293|  await new Promise(r=>setTimeout(r,1500));
-   294|  await glitch('sfH');
-   295|  await new Promise(r=>setTimeout(r,1500));
-   296|
-   297|  // "site" → "zus"
-   298|  await glitch('sfH');
-   299|  t.textContent='Deze zus kan niet worden bereikt';sMr();
-   300|  await new Promise(r=>setTimeout(r,1200));
-   301|
-   302|  // Revert — she thinks she imagined it
-   303|  await glitch('sfH');
-   304|  t.textContent='Deze site kan niet worden bereikt';
-   305|  c.textContent='ERR_CONNECTION_REFUSED';
-   306|  await new Promise(r=>setTimeout(r,2000));
-   307|
-   308|  // Bigger glitch
-   309|  document.body.classList.add('shake');sGl();await new Promise(r=>setTimeout(r,350));document.body.classList.remove('shake');
-   310|  c.textContent='ERR_SISTE_NOT_FOUND';c.style.color='#ff3b30';
-   311|  await new Promise(r=>setTimeout(r,1000));
-   312|
-   313|  f.textContent='Foutdetails: SUBJEKT_RYANY — Verwijdering in behandeling';
-   314|  f.style.color='#ff3b30';sMr();
-   315|  await new Promise(r=>setTimeout(r,1500));
-   316|
-   317|  ic.textContent='⚠️';
-   318|  await new Promise(r=>setTimeout(r,800));
-   319|
-   320|  // Full morph
-   321|  document.body.classList.add('shake');sGl();sGl();
-   322|  t.textContent='Ryany verwijderen?';
-   323|  t.style.color='#ff3b30';t.style.fontWeight='600';
-   324|  c.textContent='VERWIJDEREN_BEVESTIGEN';
-   325|  b.innerHTML='<strong>Ryany</strong> is gevonden in het systeem.<br>Soort: <strong>Zus (19)</strong><br>Rol: <strong>Liefste zus ter wereld</strong><br><br><span style="color:#ff3b30;font-weight:500;">Deze actie kan niet ongedaan worden gemaakt.</span>';
-   326|  await new Promise(r=>setTimeout(r,400));document.body.classList.remove('shake');
-   327|  await new Promise(r=>setTimeout(r,1500));
-   328|
-   329|  // IRRITANTSTE FAAH EXPLOSION
-   330|  const faah=document.getElementById('faahSnd');
-   331|  if(faah){faah.volume=1;faah.currentTime=0;faah.play().catch(()=>{})}
-   332|  document.body.classList.add('shake');sGl();sGl();sGl();
-   333|  const boom=document.createElement('div');
-   334|  boom.id='faahOverlay';
-   335|  boom.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;background:rgba(255,59,48,0.15);z-index:9999;pointer-events:none;animation:faahPulse 0.15s ease-out;';
-   336|  boom.innerHTML='<div style="font-size:min(22vw,120px);font-weight:900;color:#ff3b30;text-transform:uppercase;letter-spacing:-0.02em;text-shadow:0 0 40px rgba(255,59,48,0.6),0 0 80px rgba(255,59,48,0.3);font-family:-apple-system,BlinkMacSystemFont,sans-serif;">IRRITANTSTE</div>';
-   337|  document.body.appendChild(boom);
-   338|  await new Promise(r=>setTimeout(r,800));
-   339|  boom.remove();document.body.classList.remove('shake');
-   340|  b.innerHTML='<strong>Ryany</strong> is gevonden in het systeem.<br>Soort: <strong>Zus (19)</strong><br>Rol: <strong>Liefste zus ter wereld</strong><br><br><span style="color:#ff3b30;font-weight:500;">Deze actie kan niet ongedaan worden gemaakt.</span>';
-   341|  await new Promise(r=>setTimeout(r,1200));
-   342|
-   343|  // Buttons on error page
-   344|  const btns=document.createElement('div');
-   345|  btns.style.cssText='margin-top:24px;display:flex;gap:10px;justify-content:center;';
-   346|  btns.innerHTML='<button onclick="cancelDelete()" style="display:inline-block;width:auto;padding:10px 28px;font-size:14px;font-weight:600;border:0.5px solid rgba(0,122,255,0.2);border-radius:10px;background:rgba(0,122,255,0.08);color:#007aff;cursor:pointer;">Annuleren</button><button onclick="startDelete()" style="display:inline-block;width:auto;padding:10px 28px;font-size:14px;font-weight:600;border:0.5px solid rgba(255,59,48,0.2);border-radius:10px;background:rgba(255,59,48,0.08);color:#ff3b30;cursor:pointer;">Verwijderen</button>';
-   347|  b.appendChild(btns);
-   348|  f.style.display='none';
-   349|  sDlg();
-   350|}
-   351|
-   352|// === ROUTES ===
-   353|async function cancelDelete(){
-   354|  sCan();showA('a2');
-   355|  await new Promise(r=>setTimeout(r,2000));
-   356|  sPs();
-   357|  document.getElementById('a2Text').innerHTML='<strong>Ryany</strong> wordt niet verwijderd.<br><span style="color:#aeaeb2;">Goede keuze.</span>';
-   358|  await new Promise(r=>setTimeout(r,1800));
-   359|  sUn();
-   360|  document.getElementById('a2Text').innerHTML='<strong>Ryany</strong> wordt niet verwijderd.<br><span style="color:#aeaeb2;">...</span>';
-   361|  document.getElementById('a2Icon').textContent='😐';
-   362|  await new Promise(r=>setTimeout(r,1500));
-   363|  sUn();
-   364|  document.getElementById('a2Text').innerHTML='<span style="color:#ff3b30;">Er gebeurt iets.</span><br><span style="color:#aeaeb2;">Je drukte op annuleren, maar...</span>';
-   365|  document.getElementById('a2Icon').textContent='⚠️';
-   366|  await new Promise(r=>setTimeout(r,1800));
-   367|  sDlg();showA('a2b');
-   368|  runProgress('pbar','pLbl','stopBtn','stopA');
-   369|}
-   370|
-   371|async function startDelete(){sDlg();showA('a3');runProgress('pbar3','pLbl3','stopBtn3','stopA3')}
-   372|
-   373|// === STOP BUTTONS ===
-   374|let pc=0,pc3=0;
-   375|let blockedCb=null;
-   376|
-   377|function tryStop(){
-   378|  sPa();pc++;
-   379|  const b=document.getElementById('stopBtn');
-   380|  if(pc===1) showBlocked('Je mag dit proces niet stoppen.',()=>{b.textContent='Geweigerd';b.style.color='#c7c7cc'});
-   381|  else if(pc===2) showBlocked('Het systeem luistert niet naar je.',()=>{b.textContent='Systeem luistert niet';b.style.color='#c7c7cc'});
-   382|  else{b.disabled=true;b.textContent='Geblokkeerd';b.style.color='#d1d1d6';sFl()}
-   383|}
-   384|
-   385|function tryStop3(){
-   386|  sPa();pc3++;
-   387|  const b=document.getElementById('stopBtn3');
-   388|  if(pc3===1) showBlocked('Te laat om te stoppen.',()=>{b.textContent='Geweigerd';b.style.color='#c7c7cc'});
-   389|  else if(pc3===2) showBlocked('Het systeem weigert.',()=>{b.textContent='Systeem weigert';b.style.color='#c7c7cc'});
-   390|  else{b.disabled=true;b.textContent='Onmogelijk';b.style.color='#d1d1d6';sFl()}
-   391|}
-   392|
-   393|function showBlocked(msg,cb){
-   394|  document.getElementById('a4Text').textContent=msg;
-   395|  document.getElementById('a4').classList.add('show');
-   396|  blockedCb=cb;
-   397|}
-   398|function closeBlocked(){
-   399|  document.getElementById('a4').classList.remove('show');
-   400|  if(blockedCb){blockedCb();blockedCb=null}
-   401|}
-   402|
-   403|// === PROGRESS ===
-   404|async function runProgress(bid,lid,sid,pid){
-   405|  const bar=document.getElementById(bid),lbl=document.getElementById(lid);
-   406|  // Show stop button after 3s delay (no ghost clicks)
-   407|  setTimeout(()=>{
-   408|    const p=document.getElementById(pid);
-   409|    if(p)p.classList.add('show');
-   410|  },3000);
-   411|
-   412|  const steps=[
-   413|    {p:5,t:"Bestanden doorzoeken...",d:1200},
-   414|    {p:12,t:"223 gedeelde herinneringen gevonden",d:1400},
-   415|    {p:18,t:"Herinnering 'kerst 2019' proberen te wissen...",d:1300},
-   416|    {p:24,t:"Geweigerd. Die was te leuk.",d:1400},
-   417|    {p:30,t:"Herinnering 'samen lachen om niks' proberen...",d:1300},
-   418|    {p:36,t:"Geweigerd. Kon niet verwijderd worden.",d:1400},
-   419|    {p:42,t:"Profiel analyseren...",d:1100},
-   420|    {p:48,t:"Te belangrijk om te verwijderen.",d:1400},
-   421|    {p:54,t:"Zoektocht naar reden om te verwijderen...",d:1200},
-   422|    {p:58,t:"Geen reden gevonden.",d:1200},
-   423|    {p:63,t:"Agent-status controleren...",d:1100},
-   424|    {p:68,t:"Toekomstig agent. Verwijdering verboden.",d:1400},
-   425|    {p:74,t:"Profiel-score berekenen...",d:1200},
-   426|    {p:80,t:"Score: ∞. Verwijdering onmogelijk.",d:1400},
-   427|    {p:85,t:"Systeem probeert het toch...",d:1200},
-   428|    {p:90,t:"Geweigerd. Alles weigert.",d:1400},
-   429|    {p:95,t:"Binding te sterk. Onmogelijk.",d:1300},
-   430|    {p:100,t:"Verwijdering afgebroken.",d:1400},
-   431|  ];
-   432|  for(const s of steps){
-   433|    bar.style.width=s.p+'%';lbl.textContent=s.t;
-   434|    if(s.p>80){bar.style.background='#ff3b30';sFl()}
-   435|    else if(s.p>60){bar.style.background='#ff9500';sWr()}
-   436|    else{bar.style.background='#007aff';sPr()}
-   437|    await new Promise(r=>setTimeout(r,s.d));
-   438|  }
-   439|  const sb=document.getElementById(sid);if(sb){sb.disabled=true;sb.style.opacity='0.3'}
-   440|  await new Promise(r=>setTimeout(r,1000));
-   441|  showReveal();
-   442|}
-   443|
-   444|// === REVEAL ===
-   445|async function showReveal(){
-   446|  document.querySelectorAll('.alert-bg').forEach(o=>o.classList.remove('show'));
-   447|  document.getElementById('safari').classList.add('hidden');
-   448|  document.getElementById('a5').classList.add('show');
-   449|
-   450|  const t=document.getElementById('rText');
-   451|  t.innerHTML='Foutcode: <span class="gold">TE_LIEF_OM_TE_VERWIJDEREN</span>';
-   452|  sRv();spawnConfetti(30);
-   453|  await new Promise(r=>setTimeout(r,2200));
-   454|
-   455|  t.innerHTML+='<br><br><span class="sincere">Het systeem probeerde het. Echt.</span>';
-   456|  await new Promise(r=>setTimeout(r,1800));
-   457|
-   458|  t.innerHTML+='<br>Maar <span class="gold">liefste zus ter wereld</span> is niet zomaar te verwijderen.';
-   459|  spawnConfetti(15);
-   460|  await new Promise(r=>setTimeout(r,2200));
-   461|
-   462|  t.innerHTML+='<br><br><span class="sincere">En tussen twee haakjes — sorry dat ik je soms pest.</span>';
-   463|  await new Promise(r=>setTimeout(r,1500));
-   464|
-   465|  t.innerHTML+='<br><span class="sincere">Je verdient het. Maar toch. Sorry.</span>';
-   466|  await new Promise(r=>setTimeout(r,1800));
-   467|
-   468|  t.innerHTML+='<br><br>Verwijdering: <span class="gold">permanent geblokkeerd</span>.';
-   469|  spawnConfetti(20);
-   470|}
-   471|
-   472|function spawnConfetti(n){
-   473|  const cols=['#d4a853','#e8c97a','#ff9500','#ff3b30','#28c840','#007aff'];
-   474|  for(let i=0;i<n;i++){setTimeout(()=>{const c=document.createElement('div');c.className='confetti';const s=3+Math.random()*5;c.style.left=Math.random()*100+'vw';c.style.width=s+'px';c.style.height=s+'px';c.style.background=cols[Math.floor(Math.random()*cols.length)];c.style.borderRadius=Math.random()>0.5?'50%':'1px';c.style.animationDuration=(2+Math.random()*3)+'s';c.style.opacity=0.5+Math.random()*0.5;document.body.appendChild(c);setTimeout(()=>c.remove(),5500)},i*35)}
-   475|}
-   476|
-   477|const trapMsgs=[
-   478|  "Beschermd. Sinds geboorte.",
-   479|  "Verwijderen onmogelijk.",
-   480|  "Ryany blijft. Deal ermee.",
-   481|  "Fout: te belangrijk.",
-   482|  "Agent-status: beschermd.",
-   483|  "Zelfs de politie kan dit niet.",
-   484|];
-   485|let ti=0;
-   486|function trapClick(){
-   487|  const btn=document.getElementById('trapBtn');
-   488|  if(ti===0){
-   489|    ti++;
-   490|    const faah=document.getElementById('faahSnd');
-   491|    if(faah){faah.volume=1;faah.currentTime=0;faah.play().catch(()=>{})}
-   492|    document.body.classList.add('shake');sGl();sGl();
-   493|    const ov=document.createElement('div');
-   494|    ov.id='photoBomb';
-   495|    ov.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,0.9);z-index:99999;animation:faahPulse 0.2s ease-out;';
-   496|    ov.innerHTML='<img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAAAQABAAD/4g/wSUNDX1BST0ZJTEUAAQEAAA/gYXBwbAIQAABtbnRyUkdCIFhZWiAH6QAEAAIAFwANAC1hY3NwQVBQTAAAAABBUFBMAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABFkZXNjAAABUAAAAGJkc2NtAAABtAAABLxjcHJ0AAAGcAAAACN3dHB0AAAGlAAAABRyWFlaAAAGqAAAABRnWFlaAAAGvAAAABRiWFlaAAAG0AAAABRyVFJDAAAG5AAACAxhYXJnAAAO8AAAACB2Y2d0AAAPEAAAADBuZGluAAAPQAAAAD5tbW9kAAAPgAAAACh2Y2dwAAAPqAAAADhiVFJDAAAG5AAACAxnVFJDAAAG5AAACAxhYWJnAAAO8AAAACBhYWdnAAAO8AAAACBkZXNjAAAAAAAAAAhEaXNwbGF5AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbWx1YwAAAAAAAAAnAAAADGhySFIAAAAUAAAB5GtvS1IAAAAMAAAB+G5iTk8AAAASAAACBGlkAAAAAAASAAACFmh1SFUAAAAUAAACKGNzQ1oAAAAWAAACPHNsU0kAAAAUAAACUmRhREsAAAAcAAACZm5sTkwAAAAWAAACgmZpRkkAAAAQAAACmGl0SVQAAAAYAAACqGVzRVMAAAAWAAACwHJvUk8AAAASAAAC1mZyQ0EAAAAWAAAC6GFyAAAAAAAUAAAC/nVrVUEAAAAcAAADEmhlSUwAAAAWAAADLnpoVFcAAAAKAAADRHZpVk4AAAAOAAADTnNrU0sAAAAWAAADXHpoQ04AAAAKAAADRHJ1UlUAAAAkAAADcmVuR0IAAAAUAAADlmZyRlIAAAAWAAADqm1zAAAAAAASAAADwGhpSU4AAAASAAAD0nRoVEgAAAAMAAAD5GNhRVMAAAAYAAAD8GVuQVUAAAAUAAADlmVzWEwAAAASAAAC1mRlREUAAAAQAAAECGVuVVMAAAASAAAEGHB0QlIAAAAYAAAEKnBsUEwAAAASAAAEQmVsR1IAAAAiAAAEVHN2U0UAAAAQAAAEdnRyVFIAAAAUAAAEhnB0UFQAAAAWAAAEmmphSlAAAAAMAAAEsABMAEMARAAgAHUAIABiAG8AagBpzuy37AAgAEwAQwBEAEYAYQByAGcAZQAtAEwAQwBEAEwAQwBEACAAVwBhAHIAbgBhAFMAegDtAG4AZQBzACAATABDAEQAQgBhAHIAZQB2AG4A/QAgAEwAQwBEAEIAYQByAHYAbgBpACAATABDAEQATABDAEQALQBmAGEAcgB2AGUAcwBrAOYAcgBtAEsAbABlAHUAcgBlAG4ALQBMAEMARABWAOQAcgBpAC0ATABDAEQATABDAEQAIABhACAAYwBvAGwAbwByAGkATABDAEQAIABhACAAYwBvAGwAbwByAEwAQwBEACAAYwBvAGwAbwByAEEAQwBMACAAYwBvAHUAbABlAHUAciAPAEwAQwBEACAGRQZEBkgGRgYpBBoEPgQ7BEwEPgRABD4EMgQ4BDkAIABMAEMARCAPAEwAQwBEACAF5gXRBeIF1QXgBdlfaYJyAEwAQwBEAEwAQwBEACAATQDgAHUARgBhAHIAZQBiAG4A/QAgAEwAQwBEBCYEMgQ1BEIEPQQ+BDkAIAQWBBoALQQ0BDgEQQQ/BDsENQQ5AEMAbwBsAG8AdQByACAATABDAEQATABDAEQAIABjAG8AdQBsAGUAdQByAFcAYQByAG4AYQAgAEwAQwBECTAJAgkXCUAJK... [truncated]
-   497|    ov.onclick=()=>{ov.remove();document.body.classList.remove('shake')};
-   498|    document.body.appendChild(ov);
-   499|    setTimeout(()=>{if(document.getElementById('photoBomb'))document.getElementById('photoBomb').remove();document.body.classList.remove('shake')},6000);
-   500|    btn.textContent='NOG EEN KEER';
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>ryan-the-zilla.github.io</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow:hidden;height:100%;-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;background:#fff}
+
+/* === SAFARI ERROR === */
+.safari{
+  position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:40px 24px;color:#1d1d1f;z-index:1;
+}
+.safari.hidden{display:none}
+.sf-emoji{font-size:48px;margin-bottom:14px;opacity:0.65}
+.sf-h{font-size:17px;font-weight:600;color:#1d1d1f;margin-bottom:2px;letter-spacing:-0.2px}
+.sf-url{font-size:13px;color:#8e8e93;margin-bottom:18px}
+.sf-code{font-size:12px;color:#8e8e93;font-family:'SF Mono',Menlo,monospace;margin-bottom:4px}
+.sf-body{font-size:14px;color:#8e8e93;line-height:1.5;max-width:360px}
+.sf-body strong{color:#1d1d1f;font-weight:500}
+.sf-foot{margin-top:20px;font-size:11px;color:#c7c7cc;font-family:'SF Mono',Menlo,monospace}
+
+/* Reload button */
+.sf-reload{
+  margin-top:24px;padding:10px 28px;font-size:15px;font-family:inherit;
+  background:#007aff;color:#fff;border:none;border-radius:10px;
+  cursor:pointer;font-weight:500;letter-spacing:-0.2px;
+  transition:background 0.15s,transform 0.1s;
+}
+.sf-reload:active{background:#0062d1;transform:scale(0.97)}
+
+/* Loading spinner */
+.sf-spinner{
+  display:none;margin-top:20px;
+  width:24px;height:24px;border:2.5px solid #e5e5ea;border-top-color:#007aff;
+  border-radius:50%;animation:spin 0.8s linear infinite;
+}
+.sf-spinner.show{display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes faahPulse{0%{transform:scale(0.3);opacity:0}50%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes photoZoom{0%{transform:scale(0.2) rotate(-5deg);opacity:0}60%{transform:scale(1.1) rotate(2deg);opacity:1}100%{transform:scale(1) rotate(0deg)}}
+
+.sf-h.glitch{animation:gl 0.25s ease}
+@keyframes gl{0%{transform:translate(0)}20%{transform:translate(-2px,1px);opacity:0.7}50%{transform:translate(2px,-1px);opacity:0.9}80%{transform:translate(-1px,1px)}100%{transform:translate(0);opacity:1}}
+.shake{animation:sk 0.35s ease}
+@keyframes sk{0%,100%{transform:translate(0)}15%{transform:translate(-3px,2px)}35%{transform:translate(3px,-2px)}55%{transform:translate(-2px,1px)}75%{transform:translate(2px,-1px)}}
+
+/* === iOS ALERT === */
+.alert-bg{
+  display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.32);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  z-index:50;align-items:center;justify-content:center;padding:20px;
+}
+.alert-bg.show{display:flex}
+
+.alert-box{
+  background:rgba(255,255,255,0.98);border-radius:14px;width:100%;max-width:270px;
+  overflow:hidden;animation:aIn 0.22s cubic-bezier(0.36,0.66,0.5,1);
+  box-shadow:0 20px 60px rgba(0,0,0,0.2),0 0 0 0.5px rgba(0,0,0,0.08);
+}
+@keyframes aIn{from{transform:scale(1.08);opacity:0}to{transform:scale(1);opacity:1}}
+
+.alert-top{padding:20px 16px 16px;text-align:center}
+.alert-icon{font-size:36px;margin-bottom:8px;line-height:1}
+.alert-title{font-size:13px;font-weight:600;color:#1d1d1f;margin-bottom:4px;letter-spacing:-0.1px}
+.alert-desc{font-size:12px;color:#8e8e93;line-height:1.45}
+.alert-desc strong{color:#1d1d1f;font-weight:500}
+.alert-desc .red{color:#ff3b30;font-weight:500}
+.alert-desc .gray{color:#aeaeb2}
+
+.alert-divider{height:0.5px;background:rgba(60,60,67,0.12);margin:0}
+
+.alert-buttons{display:flex;flex-direction:column}
+.alert-btn{
+  width:100%;padding:11px 16px;font-size:13px;font-family:inherit;
+  border:none;background:none;cursor:pointer;text-align:center;
+  letter-spacing:-0.1px;transition:background 0.12s;
+}
+.alert-btn:active{background:rgba(0,0,0,0.06)}
+.alert-btn.bold{font-weight:600;color:#007aff}
+.alert-btn.red{font-weight:600;color:#ff3b30}
+.alert-btn:disabled{color:#c7c7cc;pointer-events:none}
+
+.alert-progress{padding:0 16px 14px;display:none}
+.alert-progress.show{display:block}
+.ap-track{width:100%;height:3px;background:#e5e5ea;border-radius:1.5px;overflow:hidden}
+.ap-fill{height:100%;background:#007aff;border-radius:1.5px;width:0%;transition:width 0.3s}
+.ap-text{font-size:11px;color:#8e8e93;margin-top:7px;text-align:center}
+
+/* Stop btn — hidden until enabled */
+.alert-stop{display:none;padding:0 16px 12px;text-align:center}
+.alert-stop.show{display:block}
+.alert-stop-btn{
+  font-size:11px;font-family:inherit;color:#8e8e93;border:none;background:none;
+  cursor:pointer;padding:4px 12px;transition:color 0.2s;
+}
+.alert-stop-btn:active{color:#636366}
+.alert-stop-btn:disabled{color:#d1d1d6;pointer-events:none}
+
+/* Blocked popup */
+.blocked-box{max-width:240px}
+
+/* Reveal — same alert box, warm shift */
+.alert-box.warm{
+  background:rgba(255,252,245,0.98);
+  box-shadow:0 20px 60px rgba(180,140,40,0.15),0 0 0 0.5px rgba(180,140,40,0.1);
+}
+.warm .alert-title{color:#8b6914}
+.warm .alert-desc{color:#6b5d4d}
+.warm .alert-desc .gold{color:#b8922e;font-weight:600}
+.warm .alert-desc .sincere{color:#3d3529;font-style:italic}
+.warm .alert-btn{color:#b8922e}
+
+.confetti{position:fixed;top:-10px;z-index:201;pointer-events:none;animation:cF linear forwards}
+@keyframes cF{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+@media(max-width:600px){
+  .alert-box{max-width:85%}
+}
+</style>
+</head>
+<body>
+
+<!-- Safari Error -->
+<div class="safari" id="safari">
+  <div class="sf-emoji" id="sfE">😕</div>
+  <div class="sf-h" id="sfH">Deze site kan niet worden bereikt</div>
+  <div class="sf-url">ryan-the-zilla.github.io</div>
+  <div class="sf-code" id="sfC">ERR_CONNECTION_REFUSED</div>
+  <div class="sf-body" id="sfB"><strong>ryan-the-zilla.github.io</strong> heeft de verbinding geweigerd.</div>
+  <div class="sf-foot" id="sfF">Foutdetails: CONNECTION_REFUSED — Poort 443</div>
+  <div class="sf-spinner" id="sfSpin"></div>
+  <button class="sf-reload" id="reloadBtn" onclick="startMorph()">Probeer opnieuw</button>
+</div>
+
+<!-- Alert 1: Confirm delete -->
+<div class="alert-bg" id="a1">
+  <div class="alert-box">
+    <div class="alert-top">
+      <div class="alert-icon">🗑️</div>
+      <div class="alert-title">Ryany verwijderen?</div>
+      <div class="alert-desc">
+        Weet je zeker dat je <strong>Ryany</strong> uit het systeem wilt verwijderen?<br><br>
+        Soort: <strong>Zus (19)</strong><br>
+        Rol: <strong>Liefste zus ter wereld</strong><br><br>
+        <span class="red">Deze actie kan niet ongedaan worden gemaakt.</span>
+      </div>
+    </div>
+    <div class="alert-divider"></div>
+    <div class="alert-buttons">
+      <button class="alert-btn red" onclick="startDelete()">Verwijderen</button>
+      <div class="alert-divider"></div>
+      <button class="alert-btn bold" onclick="cancelDelete()">Annuleren</button>
+    </div>
+  </div>
+</div>
+
+<!-- Alert 2: Cancelled calm -->
+<div class="alert-bg" id="a2">
+  <div class="alert-box">
+    <div class="alert-top">
+      <div class="alert-icon" id="a2Icon">✅</div>
+      <div class="alert-title">Geannuleerd</div>
+      <div class="alert-desc" id="a2Text"><strong>Ryany</strong> wordt niet verwijderd.<br>Goede keuze.</div>
+    </div>
+    <div class="alert-divider"></div>
+    <div class="alert-buttons">
+      <button class="alert-btn bold" id="a2Btn" onclick="void(0)">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Alert 2b: System override -->
+<div class="alert-bg" id="a2b">
+  <div class="alert-box">
+    <div class="alert-top">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-title">Systeemwaarschuwing</div>
+      <div class="alert-desc">
+        Je drukte op annuleren, maar <strong>Ryany</strong> heeft een beveiligingsstatus.<br>
+        <span class="gray">Verwijdering wordt uitgevoerd.</span>
+      </div>
+    </div>
+    <div class="alert-progress show">
+      <div class="ap-track"><div class="ap-fill" id="pbar"></div></div>
+      <div class="ap-text" id="pLbl">Voorbereiden...</div>
+    </div>
+    <div class="alert-stop" id="stopA">
+      <button class="alert-stop-btn" id="stopBtn" onclick="tryStop()">Annuleren</button>
+    </div>
+  </div>
+</div>
+
+<!-- Alert 3: Delete progress -->
+<div class="alert-bg" id="a3">
+  <div class="alert-box">
+    <div class="alert-top">
+      <div class="alert-icon">🗑️</div>
+      <div class="alert-title">Bezig met verwijderen...</div>
+      <div class="alert-desc"><strong>Ryany</strong> wordt permanent verwijderd.<br><span class="red">Sluit dit venster niet.</span></div>
+    </div>
+    <div class="alert-progress show">
+      <div class="ap-track"><div class="ap-fill" id="pbar3"></div></div>
+      <div class="ap-text" id="pLbl3">Voorbereiden...</div>
+    </div>
+    <div class="alert-stop" id="stopA3">
+      <button class="alert-stop-btn" id="stopBtn3" onclick="tryStop3()">Annuleren</button>
+    </div>
+  </div>
+</div>
+
+<!-- Alert 4: Blocked popup -->
+<div class="alert-bg" id="a4" style="z-index:60">
+  <div class="alert-box blocked-box">
+    <div class="alert-top">
+      <div class="alert-icon">🚫</div>
+      <div class="alert-title">Verwijdering blokkeren</div>
+      <div class="alert-desc" id="a4Text">Je mag dit proces niet stoppen.</div>
+    </div>
+    <div class="alert-divider"></div>
+    <div class="alert-buttons">
+      <button class="alert-btn bold" onclick="closeBlocked()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Alert 5: Reveal (same box, warm) -->
+<div class="alert-bg" id="a5">
+  <div class="alert-box warm" id="a5box">
+    <div class="alert-top">
+      <div class="alert-icon">🏆</div>
+      <div class="alert-title">Verwijdering mislukt.</div>
+      <div class="alert-desc" id="rText"></div>
+    </div>
+    <div class="alert-divider"></div>
+    <div class="alert-buttons">
+      <button class="alert-btn bold" id="trapBtn" onclick="trapClick()">Verrassing ❤️</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// === SOUND ===
+const AC=window.AudioContext||window.webkitAudioContext;let ax;
+function ia(){if(!ax)ax=new AC()}
+function bp(f,d,t='square',v=0.07){if(!ax)return;const o=ax.createOscillator(),g=ax.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(ax.destination);o.start();g.gain.exponentialRampToValueAtTime(0.001,ax.currentTime+d/1000);o.stop(ax.currentTime+d/1000)}
+function sGl(){bp(150+Math.random()*100,55,'sawtooth',0.05)}
+function sDlg(){bp(400,50,'sine',0.05)}
+function sCan(){bp(600,70,'sine',0.07);setTimeout(()=>bp(800,50,'sine',0.05),80)}
+function sUn(){bp(300,160,'sawtooth',0.04)}
+function sPr(){bp(500+Math.random()*200,35,'sine',0.03)}
+function sWr(){bp(250,100,'sawtooth',0.06)}
+function sFl(){for(let i=0;i<3;i++)setTimeout(()=>bp(300-i*60,50,'square',0.07),i*70)}
+function sPa(){bp(800,40,'square',0.09)}
+function sRv(){bp(523,70,'sine',0.09);setTimeout(()=>bp(659,70,'sine',0.09),90);setTimeout(()=>bp(784,90,'sine',0.11),180);setTimeout(()=>bp(1047,100,'sine',0.13),280)}
+function sTr(){bp(200,50,'square',0.05)}
+function sPs(){bp(200,250,'sine',0.025)}
+function sMr(){for(let i=0;i<4;i++)setTimeout(()=>bp(200+i*80,45,'sawtooth',0.035),i*50)}
+document.addEventListener('click',ia,{once:true});document.addEventListener('touchstart',ia,{once:true});document.addEventListener('keydown',ia,{once:true});
+
+function showA(id){document.querySelectorAll('.alert-bg').forEach(o=>o.classList.remove('show'));document.getElementById(id).classList.add('show')}
+function hideA(id){document.getElementById(id).classList.remove('show')}
+
+// === MORPH TRIGGER (auto + manual) ===
+let morphStarted=false;
+function startMorph(){
+  if(morphStarted)return;
+  morphStarted=true;
+  const spin=document.getElementById('sfSpin');
+  spin.classList.add('show');
+  setTimeout(runErrorMorph,1500);
+}
+// Auto-start after 2.5s regardless — reload button stays visible as excuse
+setTimeout(startMorph,2500);
+
+// === ERROR MORPH ===
+async function glitch(id){const e=document.getElementById(id);e.classList.add('glitch');sGl();await new Promise(r=>setTimeout(r,250));e.classList.remove('glitch')}
+
+async function runErrorMorph(){
+  const t=document.getElementById('sfH'),c=document.getElementById('sfC'),
+    b=document.getElementById('sfB'),f=document.getElementById('sfF'),
+    ic=document.getElementById('sfE'),sp=document.getElementById('sfSpin');
+
+  sp.classList.remove('show');
+  const rb=document.getElementById('reloadBtn');
+  if(rb)rb.style.display='none';
+
+  // Still looks like error... then micro-glitch
+  await new Promise(r=>setTimeout(r,1500));
+  await glitch('sfH');
+  await new Promise(r=>setTimeout(r,1500));
+
+  // "site" → "zus"
+  await glitch('sfH');
+  t.textContent='Deze zus kan niet worden bereikt';sMr();
+  await new Promise(r=>setTimeout(r,1200));
+
+  // Revert — she thinks she imagined it
+  await glitch('sfH');
+  t.textContent='Deze site kan niet worden bereikt';
+  c.textContent='ERR_CONNECTION_REFUSED';
+  await new Promise(r=>setTimeout(r,2000));
+
+  // Bigger glitch
+  document.body.classList.add('shake');sGl();await new Promise(r=>setTimeout(r,350));document.body.classList.remove('shake');
+  c.textContent='ERR_SISTE_NOT_FOUND';c.style.color='#ff3b30';
+  await new Promise(r=>setTimeout(r,1000));
+
+  f.textContent='Foutdetails: SUBJEKT_RYANY — Verwijdering in behandeling';
+  f.style.color='#ff3b30';sMr();
+  await new Promise(r=>setTimeout(r,1500));
+
+  ic.textContent='⚠️';
+  await new Promise(r=>setTimeout(r,800));
+
+  // Full morph
+  document.body.classList.add('shake');sGl();sGl();
+  t.textContent='Ryany verwijderen?';
+  t.style.color='#ff3b30';t.style.fontWeight='600';
+  c.textContent='VERWIJDEREN_BEVESTIGEN';
+  b.innerHTML='<strong>Ryany</strong> is gevonden in het systeem.<br>Soort: <strong>Zus (19)</strong><br>Rol: <strong>Liefste zus ter wereld</strong><br><br><span style="color:#ff3b30;font-weight:500;">Deze actie kan niet ongedaan worden gemaakt.</span>';
+  await new Promise(r=>setTimeout(r,400));document.body.classList.remove('shake');
+  await new Promise(r=>setTimeout(r,1500));
+
+  // IRRITANTSTE FAAH EXPLOSION
+  const faah=document.getElementById('faahSnd');
+  if(faah){faah.volume=1;faah.currentTime=0;faah.play().catch(()=>{})}
+  document.body.classList.add('shake');sGl();sGl();sGl();
+  const boom=document.createElement('div');
+  boom.id='faahOverlay';
+  boom.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;background:rgba(255,59,48,0.15);z-index:9999;pointer-events:none;animation:faahPulse 0.15s ease-out;';
+  boom.innerHTML='<div style="font-size:min(22vw,120px);font-weight:900;color:#ff3b30;text-transform:uppercase;letter-spacing:-0.02em;text-shadow:0 0 40px rgba(255,59,48,0.6),0 0 80px rgba(255,59,48,0.3);font-family:-apple-system,BlinkMacSystemFont,sans-serif;">IRRITANTSTE</div>';
+  document.body.appendChild(boom);
+  await new Promise(r=>setTimeout(r,800));
+  boom.remove();document.body.classList.remove('shake');
+  b.innerHTML='<strong>Ryany</strong> is gevonden in het systeem.<br>Soort: <strong>Zus (19)</strong><br>Rol: <strong>Liefste zus ter wereld</strong><br><br><span style="color:#ff3b30;font-weight:500;">Deze actie kan niet ongedaan worden gemaakt.</span>';
+  await new Promise(r=>setTimeout(r,1200));
+
+  // Buttons on error page
+  const btns=document.createElement('div');
+  btns.style.cssText='margin-top:24px;display:flex;gap:10px;justify-content:center;';
+  btns.innerHTML='<button onclick="cancelDelete()" style="display:inline-block;width:auto;padding:10px 28px;font-size:14px;font-weight:600;border:0.5px solid rgba(0,122,255,0.2);border-radius:10px;background:rgba(0,122,255,0.08);color:#007aff;cursor:pointer;">Annuleren</button><button onclick="startDelete()" style="display:inline-block;width:auto;padding:10px 28px;font-size:14px;font-weight:600;border:0.5px solid rgba(255,59,48,0.2);border-radius:10px;background:rgba(255,59,48,0.08);color:#ff3b30;cursor:pointer;">Verwijderen</button>';
+  b.appendChild(btns);
+  f.style.display='none';
+  sDlg();
+}
+
+// === ROUTES ===
+async function cancelDelete(){
+  sCan();showA('a2');
+  await new Promise(r=>setTimeout(r,2000));
+  sPs();
+  document.getElementById('a2Text').innerHTML='<strong>Ryany</strong> wordt niet verwijderd.<br><span style="color:#aeaeb2;">Goede keuze.</span>';
+  await new Promise(r=>setTimeout(r,1800));
+  sUn();
+  document.getElementById('a2Text').innerHTML='<strong>Ryany</strong> wordt niet verwijderd.<br><span style="color:#aeaeb2;">...</span>';
+  document.getElementById('a2Icon').textContent='😐';
+  await new Promise(r=>setTimeout(r,1500));
+  sUn();
+  document.getElementById('a2Text').innerHTML='<span style="color:#ff3b30;">Er gebeurt iets.</span><br><span style="color:#aeaeb2;">Je drukte op annuleren, maar...</span>';
+  document.getElementById('a2Icon').textContent='⚠️';
+  await new Promise(r=>setTimeout(r,1800));
+  sDlg();showA('a2b');
+  runProgress('pbar','pLbl','stopBtn','stopA');
+}
+
+async function startDelete(){sDlg();showA('a3');runProgress('pbar3','pLbl3','stopBtn3','stopA3')}
+
+// === STOP BUTTONS ===
+let pc=0,pc3=0;
+let blockedCb=null;
+
+function tryStop(){
+  sPa();pc++;
+  const b=document.getElementById('stopBtn');
+  if(pc===1) showBlocked('Je mag dit proces niet stoppen.',()=>{b.textContent='Geweigerd';b.style.color='#c7c7cc'});
+  else if(pc===2) showBlocked('Het systeem luistert niet naar je.',()=>{b.textContent='Systeem luistert niet';b.style.color='#c7c7cc'});
+  else{b.disabled=true;b.textContent='Geblokkeerd';b.style.color='#d1d1d6';sFl()}
+}
+
+function tryStop3(){
+  sPa();pc3++;
+  const b=document.getElementById('stopBtn3');
+  if(pc3===1) showBlocked('Te laat om te stoppen.',()=>{b.textContent='Geweigerd';b.style.color='#c7c7cc'});
+  else if(pc3===2) showBlocked('Het systeem weigert.',()=>{b.textContent='Systeem weigert';b.style.color='#c7c7cc'});
+  else{b.disabled=true;b.textContent='Onmogelijk';b.style.color='#d1d1d6';sFl()}
+}
+
+function showBlocked(msg,cb){
+  document.getElementById('a4Text').textContent=msg;
+  document.getElementById('a4').classList.add('show');
+  blockedCb=cb;
+}
+function closeBlocked(){
+  document.getElementById('a4').classList.remove('show');
+  if(blockedCb){blockedCb();blockedCb=null}
+}
+
+// === PROGRESS ===
+async function runProgress(bid,lid,sid,pid){
+  const bar=document.getElementById(bid),lbl=document.getElementById(lid);
+  // Show stop button after 3s delay (no ghost clicks)
+  setTimeout(()=>{
+    const p=document.getElementById(pid);
+    if(p)p.classList.add('show');
+  },3000);
+
+  const steps=[
+    {p:5,t:"Bestanden doorzoeken...",d:1200},
+    {p:12,t:"223 gedeelde herinneringen gevonden",d:1400},
+    {p:18,t:"Herinnering 'kerst 2019' proberen te wissen...",d:1300},
+    {p:24,t:"Geweigerd. Die was te leuk.",d:1400},
+    {p:30,t:"Herinnering 'samen lachen om niks' proberen...",d:1300},
+    {p:36,t:"Geweigerd. Kon niet verwijderd worden.",d:1400},
+    {p:42,t:"Profiel analyseren...",d:1100},
+    {p:48,t:"Te belangrijk om te verwijderen.",d:1400},
+    {p:54,t:"Zoektocht naar reden om te verwijderen...",d:1200},
+    {p:58,t:"Geen reden gevonden.",d:1200},
+    {p:63,t:"Agent-status controleren...",d:1100},
+    {p:68,t:"Toekomstig agent. Verwijdering verboden.",d:1400},
+    {p:74,t:"Profiel-score berekenen...",d:1200},
+    {p:80,t:"Score: ∞. Verwijdering onmogelijk.",d:1400},
+    {p:85,t:"Systeem probeert het toch...",d:1200},
+    {p:90,t:"Geweigerd. Alles weigert.",d:1400},
+    {p:95,t:"Binding te sterk. Onmogelijk.",d:1300},
+    {p:100,t:"Verwijdering afgebroken.",d:1400},
+  ];
+  for(const s of steps){
+    bar.style.width=s.p+'%';lbl.textContent=s.t;
+    if(s.p>80){bar.style.background='#ff3b30';sFl()}
+    else if(s.p>60){bar.style.background='#ff9500';sWr()}
+    else{bar.style.background='#007aff';sPr()}
+    await new Promise(r=>setTimeout(r,s.d));
+  }
+  const sb=document.getElementById(sid);if(sb){sb.disabled=true;sb.style.opacity='0.3'}
+  await new Promise(r=>setTimeout(r,1000));
+  showReveal();
+}
+
+// === REVEAL ===
+async function showReveal(){
+  document.querySelectorAll('.alert-bg').forEach(o=>o.classList.remove('show'));
+  document.getElementById('safari').classList.add('hidden');
+  document.getElementById('a5').classList.add('show');
+
+  const t=document.getElementById('rText');
+  t.innerHTML='Foutcode: <span class="gold">TE_LIEF_OM_TE_VERWIJDEREN</span>';
+  sRv();spawnConfetti(30);
+  await new Promise(r=>setTimeout(r,2200));
+
+  t.innerHTML+='<br><br><span class="sincere">Het systeem probeerde het. Echt.</span>';
+  await new Promise(r=>setTimeout(r,1800));
+
+  t.innerHTML+='<br>Maar <span class="gold">liefste zus ter wereld</span> is niet zomaar te verwijderen.';
+  spawnConfetti(15);
+  await new Promise(r=>setTimeout(r,2200));
+
+  t.innerHTML+='<br><br><span class="sincere">En tussen twee haakjes — sorry dat ik je soms pest.</span>';
+  await new Promise(r=>setTimeout(r,1500));
+
+  t.innerHTML+='<br><span class="sincere">Je verdient het. Maar toch. Sorry.</span>';
+  await new Promise(r=>setTimeout(r,1800));
+
+  t.innerHTML+='<br><br>Verwijdering: <span class="gold">permanent geblokkeerd</span>.';
+  spawnConfetti(20);
+}
+
+function spawnConfetti(n){
+  const cols=['#d4a853','#e8c97a','#ff9500','#ff3b30','#28c840','#007aff'];
+  for(let i=0;i<n;i++){setTimeout(()=>{const c=document.createElement('div');c.className='confetti';const s=3+Math.random()*5;c.style.left=Math.random()*100+'vw';c.style.width=s+'px';c.style.height=s+'px';c.style.background=cols[Math.floor(Math.random()*cols.length)];c.style.borderRadius=Math.random()>0.5?'50%':'1px';c.style.animationDuration=(2+Math.random()*3)+'s';c.style.opacity=0.5+Math.random()*0.5;document.body.appendChild(c);setTimeout(()=>c.remove(),5500)},i*35)}
+}
+
+const trapMsgs=[
+  "Beschermd. Sinds geboorte.",
+  "Verwijderen onmogelijk.",
+  "Ryany blijft. Deal ermee.",
+  "Fout: te belangrijk.",
+  "Agent-status: beschermd.",
+  "Zelfs de politie kan dit niet.",
+];
+let ti=0;
+function trapClick(){
+  const btn=document.getElementById('trapBtn');
+  if(ti===0){
+    ti++;
+    const faah=document.getElementById('faahSnd');
+    if(faah){faah.volume=1;faah.currentTime=0;faah.play().catch(()=>{})}
+    document.body.classList.add('shake');sGl();sGl();
+    const ov=document.createElement('div');
+    ov.id='photoBomb';
+    ov.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,0.9);z-index:99999;animation:faahPulse 0.2s ease-out;';
+    ov.innerHTML='<img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAAAQABAAD/4g/wSUNDX1BST0ZJTEUAAQEAAA/gYXBwbAIQAABtbnRyUkdCIFhZWiAH6QAEAAIAFwANAC1hY3NwQVBQTAAAAABBUFBMAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABFkZXNjAAABUAAAAGJkc2NtAAABtAAABLxjcHJ0AAAGcAAAACN3dHB0AAAGlAAAABRyWFlaAAAGqAAAABRnWFlaAAAGvAAAABRiWFlaAAAG0AAAABRyVFJDAAAG5AAACAxhYXJnAAAO8AAAACB2Y2d0AAAPEAAAADBuZGluAAAPQAAAAD5tbW9kAAAPgAAAACh2Y2dwAAAPqAAAADhiVFJDAAAG5AAACAxnVFJDAAAG5AAACAxhYWJnAAAO8AAAACBhYWdnAAAO8AAAACBkZXNjAAAAAAAAAAhEaXNwbGF5AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbWx1YwAAAAAAAAAnAAAADGhySFIAAAAUAAAB5GtvS1IAAAAMAAAB+G5iTk8AAAASAAACBGlkAAAAAAASAAACFmh1SFUAAAAUAAACKGNzQ1oAAAAWAAACPHNsU0kAAAAUAAACUmRhREsAAAAcAAACZm5sTkwAAAAWAAACgmZpRkkAAAAQAAACmGl0SVQAAAAYAAACqGVzRVMAAAAWAAACwHJvUk8AAAASAAAC1mZyQ0EAAAAWAAAC6GFyAAAAAAAUAAAC/nVrVUEAAAAcAAADEmhlSUwAAAAWAAADLnpoVFcAAAAKAAADRHZpVk4AAAAOAAADTnNrU0sAAAAWAAADXHpoQ04AAAAKAAADRHJ1UlUAAAAkAAADcmVuR0IAAAAUAAADlmZyRlIAAAAWAAADqm1zAAAAAAASAAADwGhpSU4AAAASAAAD0nRoVEgAAAAMAAAD5GNhRVMAAAAYAAAD8GVuQVUAAAAUAAADlmVzWEwAAAASAAAC1mRlREUAAAAQAAAECGVuVVMAAAASAAAEGHB0QlIAAAAYAAAEKnBsUEwAAAASAAAEQmVsR1IAAAAiAAAEVHN2U0UAAAAQAAAEdnRyVFIAAAAUAAAEhnB0UFQAAAAWAAAEmmphSlAAAAAMAAAEsABMAEMARAAgAHUAIABiAG8AagBpzuy37AAgAEwAQwBEAEYAYQByAGcAZQAtAEwAQwBEAEwAQwBEACAAVwBhAHIAbgBhAFMAegDtAG4AZQBzACAATABDAEQAQgBhAHIAZQB2AG4A/QAgAEwAQwBEAEIAYQByAHYAbgBpACAATABDAEQATABDAEQALQBmAGEAcgB2AGUAcwBrAOYAcgBtAEsAbABlAHUAcgBlAG4ALQBMAEMARABWAOQAcgBpAC0ATABDAEQATABDAEQAIABhACAAYwBvAGwAbwByAGkATABDAEQAIABhACAAYwBvAGwAbwByAEwAQwBEACAAYwBvAGwAbwByAEEAQwBMACAAYwBvAHUAbABlAHUAciAPAEwAQwBEACAGRQZEBkgGRgYpBBoEPgQ7BEwEPgRABD4EMgQ4BDkAIABMAEMARCAPAEwAQwBEACAF5gXRBeIF1QXgBdlfaYJyAEwAQwBEAEwAQwBEACAATQDgAHUARgBhAHIAZQBiAG4A/QAgAEwAQwBEBCYEMgQ1BEIEPQQ+BDkAIAQWBBoALQQ0BDgEQQQ/BDsENQQ5AEMAbwBsAG8AdQByACAATABDAEQATABDAEQAIABjAG8AdQBsAGUAdQByAFcAYQByAG4AYQAgAEwAQwBECTAJAgkXCUAJK... [truncated]
+    ov.onclick=()=>{ov.remove();document.body.classList.remove('shake')};
+    document.body.appendChild(ov);
+    setTimeout(()=>{if(document.getElementById('photoBomb'))document.getElementById('photoBomb').remove();document.body.classList.remove('shake')},6000);
+    btn.textContent='NOG EEN KEER';
    501
 |
 
