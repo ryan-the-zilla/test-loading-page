@@ -286,8 +286,7 @@ async function runErrorMorph(){
     ic=document.getElementById('sfE'),sp=document.getElementById('sfSpin');
 
   sp.classList.remove('show');
-  const rb=document.getElementById('reloadBtn');
-  if(rb)rb.style.display='none';
+  // reload button stays visible
 
   // Still looks like error... then micro-glitch
   await new Promise(r=>setTimeout(r,1500));
