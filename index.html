@@ -69,6 +69,7 @@
   }
   .dialog-desc strong { color: #1a1a1a; }
   .dialog-desc .warn { color: #c42b1c; font-weight: 600; }
+  .dialog-desc .soft { color: #888; }
 
   .dialog-buttons {
     padding: 12px 22px 18px;
@@ -122,8 +123,8 @@
     transition: width 0.4s;
   }
   .progress-label {
-    font-size: 12px;
-    color: #888;
+    font-size: 12.5px;
+    color: #666;
     margin-top: 10px;
     line-height: 1.5;
   }
@@ -133,6 +134,15 @@
     padding: 0 22px 14px;
   }
   .panic-buttons.show { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* Cancelled calm screen */
+  .cancelled-text {
+    padding: 18px 22px;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.7;
+  }
+  .cancelled-text .delay { color: #aaa; }
 
   /* Reveal */
   .reveal-overlay {
@@ -161,14 +171,15 @@
     margin-bottom: 10px;
   }
   .rv-sub {
-    color: #888;
+    color: #999;
     font-size: 1.05em;
-    line-height: 1.7;
-    max-width: 400px;
+    line-height: 1.8;
+    max-width: 420px;
     font-family: 'Segoe UI', sans-serif;
   }
   .rv-sub .acc { color: #ffd700; font-weight: 600; }
-  .rv-footer { margin-top: 25px; color: #444; font-size: 0.9em; }
+  .rv-sub .sincere { color: #ccc; }
+  .rv-footer { margin-top: 30px; color: #555; font-size: 0.9em; }
   .rv-trap { margin-top: 20px; color: #555; font-size: 0.85em; display: none; cursor: pointer; }
   .rv-trap.show { display: block; }
   .rv-trap-msg { color: #ff4444; margin-top: 8px; }
@@ -194,8 +205,8 @@
         <div class="dialog-desc">
           Weet je zeker dat je <strong>Ryany</strong> uit de familie wilt verwijderen?<br><br>
           Type: <strong>Zus (19)</strong><br>
-          Grootte: <strong>Onmeetbaar</strong><br>
-          Laatst gezien: <strong>Vandaag</strong>
+          Status: <strong>Toekomstig agent</strong><br>
+          Waarschuwing: <span class="warn">Deze actie kan niet ongedaan worden gemaakt.</span>
         </div>
       </div>
     </div>
@@ -206,33 +217,33 @@
   </div>
 </div>
 
-<!-- Phase 2: Cancelled — but then auto-delete triggers -->
+<!-- Phase 2a: Cancelled — calm, then uneasy -->
 <div class="overlay" id="p2">
   <div class="dialog">
     <div class="dialog-header">
       <div class="dialog-icon">✅</div>
       <div class="dialog-text">
         <div class="dialog-title">Geannuleerd</div>
-        <div class="dialog-desc">
-          <strong>Ryany</strong> wordt niet verwijderd.<br><br>
-          ...<br><br>
-          <span class="warn">Wacht. Er gebeurt iets raars.</span>
+        <div class="dialog-desc" id="cancelText">
+          <strong>Ryany</strong> wordt niet verwijderd.<br>
+          Goede keuze.
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Phase 3: Self-delete triggered -->
-<div class="overlay" id="p3">
+<!-- Phase 2b: Something is off -->
+<div class="overlay" id="p2b">
   <div class="dialog">
     <div class="dialog-header">
       <div class="dialog-icon">⚠️</div>
       <div class="dialog-text">
-        <div class="dialog-title">Automatisch proces gestart</div>
+        <div class="dialog-title">Wacht even.</div>
         <div class="dialog-desc">
-          <strong>Ryany</strong> wordt automatisch verwijderd...<br>
-          <span class="warn">Dit was je niet. Het systeem deed het zelf.</span>
+          Je drukte op annuleren, maar het systeem heeft iets gevonden.<br><br>
+          <strong>Ryany</strong> heeft een beveiligingsstatus.<br>
+          <span class="soft">Verwijdering wordt uitgevoerd om onbekende reden.</span>
         </div>
       </div>
     </div>
@@ -246,17 +257,35 @@
   </div>
 </div>
 
+<!-- Phase 3: Delete clicked — direct progress -->
+<div class="overlay" id="p3">
+  <div class="dialog">
+    <div class="dialog-header">
+      <div class="dialog-icon">🗑️</div>
+      <div class="dialog-text">
+        <div class="dialog-title">Bezig met verwijderen...</div>
+        <div class="dialog-desc">
+          <strong>Ryany</strong> wordt permanent verwijderd.<br>
+          <span class="warn">Sluit dit venster niet.</span>
+        </div>
+      </div>
+    </div>
+    <div class="progress-wrap show">
+      <div class="progress-outer"><div class="progress-inner" id="pbar3"></div></div>
+      <div class="progress-label" id="progressLabel3">Voorbereiden...</div>
+    </div>
+    <div class="panic-buttons show" id="panicBtns3">
+      <button class="btn btn-primary" id="stopBtn3" onclick="tryStop3()">Annuleren</button>
+    </div>
+  </div>
+</div>
+
 <!-- Reveal -->
 <div class="reveal-overlay" id="reveal">
   <div class="rv-emoji">🏆</div>
   <div class="rv-title">Verwijdering mislukt.</div>
-  <div class="rv-sub">
-    Foutcode: <strong>TE_LIEF_OM_TE_VERWIJDEREN</strong><br><br>
-    Het systeem probeerde het. Echt.<br>
-    Maar <span class="acc">liefste zus ter wereld</span> is een beschermd bestand.<br>
-    Verwijdering: permanent geblokkeerd.
-  </div>
-  <div class="rv-footer">— RyanOS (je broer)</div>
+  <div class="rv-sub" id="revealText"></div>
+  <div class="rv-footer">— Je broer (helaas)</div>
   <div class="rv-trap" id="trap">klik ergens om te sluiten
     <div class="rv-trap-msg" id="trapMsg"></div>
   </div>
@@ -277,110 +306,161 @@ function beep(freq, dur, type='square', vol=0.08) {
 }
 function sndDialog() { beep(400, 60, 'sine', 0.06); }
 function sndCancel() { beep(600, 80, 'sine', 0.08); setTimeout(()=>beep(800, 60, 'sine', 0.06), 100); }
-function sndWeird() { beep(300, 200, 'sawtooth', 0.06); setTimeout(()=>beep(400, 300, 'sawtooth', 0.04), 250); }
+function sndUneasy() { beep(300, 250, 'sawtooth', 0.05); setTimeout(()=>beep(350, 300, 'sawtooth', 0.04), 300); }
 function sndProgress() { beep(500+Math.random()*200, 50, 'sine', 0.04); }
 function sndWarn() { beep(250, 200, 'sawtooth', 0.08); }
 function sndFail() { for(let i=0;i<3;i++) setTimeout(()=>beep(300-i*60, 100, 'square', 0.08), i*120); }
 function sndPanic() { beep(800, 80, 'square', 0.1); }
 function sndReveal() { beep(523,100,'sine',0.1); setTimeout(()=>beep(659,100,'sine',0.1),120); setTimeout(()=>beep(784,150,'sine',0.12),240); setTimeout(()=>beep(1047,200,'sine',0.15),400); }
 function sndTrap() { beep(200, 100, 'square', 0.06); }
+function sndPause() { beep(200, 600, 'sine', 0.03); }
 document.addEventListener('click', initAudio, { once: true });
 document.addEventListener('keydown', initAudio, { once: true });
 // === END SOUND ENGINE ===
 
 function show(id) {
   document.querySelectorAll('.overlay').forEach(o => o.classList.remove('show'));
-  document.getElementById(id).classList.add('show');
+  const el = document.getElementById(id);
+  if (el) el.classList.add('show');
 }
 
-// Phase 1: She cancels → everything seems fine
+// === CANCEL ROUTE ===
 async function cancelDelete() {
   sndCancel();
   show('p2');
-  // Wait... then something weird happens
+
+  // Calm moment — she thinks it's over
   await new Promise(r => setTimeout(r, 3000));
-  sndWeird();
-  await new Promise(r => setTimeout(r, 1500));
-  // Auto-delete triggers
-  show('p3');
+
+  // Text slowly changes...
+  sndPause();
+  document.getElementById('cancelText').innerHTML = '<strong>Ryany</strong> wordt niet verwijderd.<br><span class="delay">Goede keuze.</span>';
+  await new Promise(r => setTimeout(r, 2500));
+
+  // Uneasy
+  sndUneasy();
+  document.getElementById('cancelText').innerHTML = '<strong>Ryany</strong> wordt niet verwijderd.<br><span class="delay">...</span>';
+  await new Promise(r => setTimeout(r, 2000));
+
+  // Something is wrong
+  sndUneasy();
+  document.getElementById('cancelText').innerHTML = '<span class="warn">Er gebeurt iets.</span><br><span class="delay">Je drukte op annuleren, maar...</span>';
+  await new Promise(r => setTimeout(r, 2500));
+
+  // Launch system delete
   sndDialog();
-  runProgress();
+  show('p2b');
+  runProgress('pbar', 'progressLabel', 'stopBtn');
 }
 
-// Phase 1 alt: She clicks delete → goes directly to progress
+// === DELETE ROUTE ===
 async function startDelete() {
   sndDialog();
   show('p3');
-  runProgress();
+  runProgress('pbar3', 'progressLabel3', 'stopBtn3');
 }
 
-// Panic stop button
+// === STOP BUTTONS ===
 let panicClicks = 0;
+let panicClicks3 = 0;
+
 function tryStop() {
   sndPanic();
   panicClicks++;
   const btn = document.getElementById('stopBtn');
-  if (panicClicks === 1) {
-    btn.textContent = "⏹ Stoppen geweigerd";
-    btn.style.fontSize = "12px";
-  } else if (panicClicks === 2) {
-    btn.textContent = "⏹ Proces stopt niet";
-    btn.style.fontSize = "11px";
-  } else {
-    btn.disabled = true;
-    btn.textContent = "⏹ Geblokkeerd";
-    btn.style.opacity = "0.4";
-    sndFail();
-  }
+  if (panicClicks === 1) { btn.textContent = "⏹ Stoppen geweigerd"; btn.style.fontSize = "12px"; }
+  else if (panicClicks === 2) { btn.textContent = "⏹ Het systeem luistert niet"; btn.style.fontSize = "11px"; }
+  else { btn.disabled = true; btn.textContent = "⏹ Geblokkeerd"; btn.style.opacity = "0.4"; sndFail(); }
 }
 
-// Progress — readable, emotional, understandable
-async function runProgress() {
-  const bar = document.getElementById('pbar');
-  const label = document.getElementById('progressLabel');
+function tryStop3() {
+  sndPanic();
+  panicClicks3++;
+  const btn = document.getElementById('stopBtn3');
+  if (panicClicks3 === 1) { btn.textContent = "Annuleren geweigerd"; btn.style.fontSize = "12px"; }
+  else if (panicClicks3 === 2) { btn.textContent = "Te laat om te stoppen"; btn.style.fontSize = "11px"; }
+  else { btn.disabled = true; btn.textContent = "Onmogelijk"; btn.style.opacity = "0.4"; sndFail(); }
+}
+
+// === PROGRESS ENGINE ===
+async function runProgress(barId, labelId, stopBtnId) {
+  const bar = document.getElementById(barId);
+  const label = document.getElementById(labelId);
 
   const steps = [
-    { p: 5, t: "Bestanden doorzoeken...", d: 2000 },
-    { p: 12, t: "223 gedeelde herinneringen gevonden", d: 2500 },
-    { p: 20, t: "Herinnering 'kerst 2019' proberen te wissen...", d: 2800 },
-    { p: 26, t: "Geweigerd. Die was te leuk.", d: 2500 },
-    { p: 32, t: "Herinnering 'samen lachen om niks' proberen...", d: 2800 },
-    { p: 38, t: "Geweigerd. Kon niet verwijderd worden.", d: 2500 },
-    { p: 44, t: "847 foto's doorzoeken...", d: 2200 },
-    { p: 50, t: "Foto's kunnen niet gewist worden. Te belangrijk.", d: 3000 },
-    { p: 58, t: "34 gedeelde geheimen gevonden", d: 2500 },
-    { p: 64, t: "Geheimen geweigerd door systeem.", d: 2500 },
-    { p: 70, t: "Ryany's humor probeert verwijderd te worden...", d: 2800 },
-    { p: 76, t: "Mislukt. Onvervangbaar.", d: 2500 },
-    { p: 82, t: "Loyaliteit controleren...", d: 2200 },
-    { p: 88, t: "Kan niet verwijderd worden. Maximum bereikt.", d: 3000 },
-    { p: 93, t: "Conclusie trekken...", d: 3000 },
-    { p: 97, t: "Onmogelijk om te verwijderen.", d: 2800 },
+    { p: 3, t: "Bestanden doorzoeken...", d: 2000 },
+    { p: 8, t: "223 gedeelde herinneringen gevonden", d: 2800 },
+    { p: 14, t: "Herinnering 'kerst 2019' proberen te wissen...", d: 2500 },
+    { p: 19, t: "Geweigerd. Die was te leuk.", d: 2800 },
+    { p: 24, t: "Herinnering 'samen lachen om niks' proberen...", d: 2500 },
+    { p: 29, t: "Geweigerd. Kon niet verwijderd worden.", d: 2800 },
+    { p: 34, t: "847 foto's doorzoeken...", d: 2200 },
+    { p: 40, t: "Foto's kunnen niet gewist worden. Te belangrijk.", d: 3000 },
+    { p: 46, t: "Zoektocht naar reden om te verwijderen...", d: 2500 },
+    { p: 50, t: "Geen reden gevonden.", d: 2500 },
+    { p: 55, t: "Agent-status controleren...", d: 2200 },
+    { p: 60, t: "Toekomstig agent. Verwijdering verboden.", d: 3000 },
+    { p: 66, t: "34 gedeelde geheimen gevonden", d: 2500 },
+    { p: 72, t: "Geheimen weigeren verwijderd te worden.", d: 2800 },
+    { p: 77, t: "Systeem probeert het toch...", d: 2500 },
+    { p: 82, t: "Geweigerd. Alles weigert.", d: 3000 },
+    { p: 87, t: "Verwijdering onmogelijk. Binding te sterk.", d: 3000 },
+    { p: 92, t: "Conclusie trekken...", d: 3000 },
+    { p: 96, t: "Onmogelijk om te verwijderen.", d: 2800 },
     { p: 100, t: "Verwijdering afgebroken. Alles geweigerd.", d: 3000 },
   ];
 
   for (const s of steps) {
     bar.style.width = s.p + '%';
     label.textContent = s.t;
-    if (s.p > 70) { bar.style.background = '#c42b1c'; sndWarn(); }
-    else if (s.p > 50) { bar.style.background = '#e8a030'; sndFail(); }
-    else { sndProgress(); }
+    if (s.p > 75) { bar.style.background = '#c42b1c'; sndFail(); }
+    else if (s.p > 55) { bar.style.background = '#e8a030'; sndWarn(); }
+    else { bar.style.background = '#0078d4'; sndProgress(); }
     if (s.p > 90) bar.style.background = '#ff4444';
     await new Promise(r => setTimeout(r, s.d));
   }
+
+  // Disable stop button
+  const stopBtn = document.getElementById(stopBtnId);
+  if (stopBtn) { stopBtn.disabled = true; stopBtn.style.opacity = '0.3'; }
 
   await new Promise(r => setTimeout(r, 1500));
   showReveal();
 }
 
-function showReveal() {
+// === REVEAL ===
+async function showReveal() {
   document.querySelectorAll('.overlay').forEach(o => o.classList.remove('show'));
-  document.getElementById('reveal').classList.add('show');
+  const revealEl = document.getElementById('reveal');
+  revealEl.classList.add('show');
+
+  const text = document.getElementById('revealText');
+  text.innerHTML = 'Foutcode: <strong>TE_LIEF_OM_TE_VERWIJDEREN</strong>';
+
   sndReveal();
   spawnConfetti(50);
-  setTimeout(() => {
-    document.getElementById('trap').classList.add('show');
-  }, 2000);
+
+  await new Promise(r => setTimeout(r, 3000));
+
+  // Line 2
+  text.innerHTML += '<br><br>Het systeem probeerde het. Echt.';
+  await new Promise(r => setTimeout(r, 2500));
+
+  // Line 3 — the punch
+  text.innerHTML += '<br>Maar <span class="acc">liefste zus ter wereld</span> is een beschermd bestand.';
+  await new Promise(r => setTimeout(r, 3000));
+
+  // Line 4 — the sincere one
+  text.innerHTML += '<br><br><span class="sincere">En tussen twee haakjes — sorry dat ik je soms pest.</span>';
+  await new Promise(r => setTimeout(r, 2000));
+  text.innerHTML += '<br><span class="sincere">Je verdient het. Maar toch. Sorry.</span>';
+
+  await new Promise(r => setTimeout(r, 2500));
+
+  // Final
+  text.innerHTML += '<br><br>Verwijdering: <strong>permanent geblokkeerd</strong>.';
+
+  setTimeout(() => { document.getElementById('trap').classList.add('show'); }, 1500);
 }
 
 function spawnConfetti(n) {
@@ -405,23 +485,22 @@ function spawnConfetti(n) {
 const trapMsgs = [
   "Beschermd bestand. Sinds geboorte.",
   "Verwijderen onmogelijk. Liefste zus forever.",
-  "Zelfs admin heeft geen rechten hier.",
+  "Zelfs de politie kan dit niet verwijderen.",
   "Ryany blijft. Deal ermee.",
   "Fout: te belangrijk om te verwijderen.",
+  "Agent-status: beschermd. Verwijdering verboden.",
 ];
 let trapIdx = 0;
 
 document.getElementById('reveal').addEventListener('click', () => {
-  const trap = document.getElementById('trap');
-  if (!trap.classList.contains('show')) return;
+  if (!document.getElementById('trap').classList.contains('show')) return;
   document.getElementById('trapMsg').textContent = '> ' + trapMsgs[trapIdx % trapMsgs.length];
   trapIdx++;
   sndTrap();
   spawnConfetti(8);
 });
 document.addEventListener('keydown', () => {
-  const trap = document.getElementById('trap');
-  if (!trap.classList.contains('show')) return;
+  if (!document.getElementById('trap').classList.contains('show')) return;
   document.getElementById('trapMsg').textContent = '> ' + trapMsgs[trapIdx % trapMsgs.length];
   trapIdx++;
   sndTrap();
