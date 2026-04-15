@@ -319,20 +319,20 @@ const panicMsgs = [
 ];
 
 const progressSteps = [
-  { p: 5, t: "Bestanden scannen..." },
-  { p: 12, t: "Gedeelde herinneringen doorzoeken..." },
-  { p: 20, t: "223 herinneringen gevonden. Verwijderen..." },
-  { p: 28, t: "Fout: herinnering 'kerst 2019' geweigerd." },
-  { p: 35, t: "Fout: herinnering 'lachen om niks' vergrendeld." },
-  { p: 42, t: "Meerdere bestanden weigeren verwijderd te worden." },
-  { p: 50, t: "Humor.data kan niet geleegd worden." },
-  { p: 58, t: "Loyaliteit.lock → Access denied." },
-  { p: 65, t: "Sarcasme.cache → schrijfbeveiligd." },
-  { p: 72, t: "WAARSCHUWING: systeem verzet zich." },
-  { p: 80, t: "KRITIEK: liefde.quota overschrijdt veiligheidslimiet." },
-  { p: 88, t: "Onmogelijk te verwijderen. Binding te sterk." },
-  { p: 95, t: "Operation FAILED: TE_LIEF_OM_TE_VERWIJDEREN" },
-  { p: 100, t: "Verwijdering afgebroken." },
+  { p: 5, t: "Bestanden scannen...", d: 1800 },
+  { p: 12, t: "Gedeelde herinneringen doorzoeken...", d: 2000 },
+  { p: 20, t: "223 herinneringen gevonden. Verwijderen...", d: 2200 },
+  { p: 28, t: "Fout: herinnering 'kerst 2019' geweigerd.", d: 2500 },
+  { p: 35, t: "Fout: herinnering 'lachen om niks' vergrendeld.", d: 2500 },
+  { p: 42, t: "Meerdere bestanden weigeren verwijderd te worden.", d: 2200 },
+  { p: 50, t: "Humor.data kan niet geleegd worden.", d: 2000 },
+  { p: 58, t: "Loyaliteit.lock → Access denied.", d: 2200 },
+  { p: 65, t: "Sarcasme.cache → schrijfbeveiligd.", d: 2000 },
+  { p: 72, t: "WAARSCHUWING: systeem verzet zich.", d: 2800 },
+  { p: 80, t: "KRITIEK: liefde.quota overschrijdt veiligheidslimiet.", d: 3000 },
+  { p: 88, t: "Onmogelijk te verwijderen. Binding te sterk.", d: 2500 },
+  { p: 95, t: "Operation FAILED: TE_LIEF_OM_TE_VERWIJDEREN", d: 3000 },
+  { p: 100, t: "Verwijdering afgebroken.", d: 2000 },
 ];
 
 const trapMsgs = [
@@ -418,7 +418,7 @@ async function runProgress() {
     else if (s.p > 40) { sndWarn(); }
     else { sndProgress(); }
     if (s.p > 85) bar.style.background = '#ff4444';
-    await new Promise(r => setTimeout(r, 800 + Math.random()*600));
+    await new Promise(r => setTimeout(r, s.d));
   }
 
   await new Promise(r => setTimeout(r, 800));
