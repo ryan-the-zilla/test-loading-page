@@ -260,7 +260,7 @@ function sRv(){bp(523,70,'sine',0.09);setTimeout(()=>bp(659,70,'sine',0.09),90);
 function sTr(){bp(200,50,'square',0.05)}
 function sPs(){bp(200,250,'sine',0.025)}
 function sMr(){for(let i=0;i<4;i++)setTimeout(()=>bp(200+i*80,45,'sawtooth',0.035),i*50)}
-document.addEventListener('click',ia,{once:true});document.addEventListener('touchstart',ia,{once:true});document.addEventListener('keydown',ia,{once:true});
+document.addEventListener('click',()=>{ia();const f=document.getElementById('faahSnd');if(f)f.play().then(()=>{f.pause();f.currentTime=0}).catch(()=>{})},{once:true});document.addEventListener('touchstart',()=>{ia();const f=document.getElementById('faahSnd');if(f)f.play().then(()=>{f.pause();f.currentTime=0}).catch(()=>{})},{once:true});document.addEventListener('keydown',()=>{ia();const f=document.getElementById('faahSnd');if(f)f.play().then(()=>{f.pause();f.currentTime=0}).catch(()=>{})},{once:true});
 
 function showA(id){document.querySelectorAll('.alert-bg').forEach(o=>o.classList.remove('show'));document.getElementById(id).classList.add('show')}
 function hideA(id){document.getElementById(id).classList.remove('show')}
