@@ -6,6 +6,7 @@
 <title>ryan-the-zilla.github.io</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { overflow: hidden; height: 100%; }
 
   /* === FAKE ERROR PAGE === */
   .error-page {
@@ -272,7 +273,7 @@
       <div class="progress-outer"><div class="progress-inner" id="pbar"></div></div>
       <div class="progress-label" id="progressLabel">Voorbereiden...</div>
     </div>
-    <div class="panic-buttons show" id="panicBtns">
+    <div class="panic-buttons" id="panicBtns">
       <button class="btn btn-primary" id="stopBtn" onclick="tryStop()">⏹ Stoppen</button>
     </div>
   </div>
@@ -295,7 +296,7 @@
       <div class="progress-outer"><div class="progress-inner" id="pbar3"></div></div>
       <div class="progress-label" id="progressLabel3">Voorbereiden...</div>
     </div>
-    <div class="panic-buttons show" id="panicBtns3">
+    <div class="panic-buttons" id="panicBtns3">
       <button class="btn btn-primary" id="stopBtn3" onclick="tryStop3()">Annuleren</button>
     </div>
   </div>
@@ -416,7 +417,17 @@ async function runErrorMorph() {
   document.body.classList.remove('shake');
 
   // Wait — she's reading, realizing what's happening
-  await new Promise(r => setTimeout(r, 2000));
+  await new Promise(r => setTimeout(r, 1500));
+
+  // Glitch: "liefste" → "irritanste" → back to "liefste"
+  document.body.classList.add('shake');
+  sndGlitch();
+  detail.innerHTML = '<strong>Ryany</strong> is gevonden in het systeem.<br>Type: <strong>Zus (19)</strong><br>Rol: <strong style="color:#c42b1c;">Irritanste zus ter wereld</strong><br><br><span style="color:#c42b1c;font-weight:600;">Deze actie kan niet ongedaan worden gemaakt.</span>';
+  await new Promise(r => setTimeout(r, 800));
+  document.body.classList.remove('shake');
+  // Back to sweet
+  detail.innerHTML = '<strong>Ryany</strong> is gevonden in het systeem.<br>Type: <strong>Zus (19)</strong><br>Rol: <strong>Liefste zus ter wereld</strong><br><br><span style="color:#c42b1c;font-weight:600;">Deze actie kan niet ongedaan worden gemaakt.</span>';
+  await new Promise(r => setTimeout(r, 1200));
 
   // Buttons appear — the error page BECOMES the dialog
   const btns = document.createElement('div');
@@ -487,6 +498,12 @@ function tryStop3() {
 async function runProgress(barId, labelId, stopBtnId) {
   const bar = document.getElementById(barId);
   const label = document.getElementById(labelId);
+
+  // Show stop button after delay (prevent ghost clicks from touch)
+  setTimeout(() => {
+    const pb = stopBtnId === 'stopBtn' ? document.getElementById('panicBtns') : document.getElementById('panicBtns3');
+    if (pb) pb.classList.add('show');
+  }, 2500);
 
   const steps = [
     { p: 5, t: "Bestanden doorzoeken...", d: 1200 },
