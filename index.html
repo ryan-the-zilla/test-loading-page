@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>ryan-the-zilla.github.io</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -19,17 +19,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
 .sf-emoji{font-size:48px;margin-bottom:14px;opacity:0.65}
 .sf-h{font-size:17px;font-weight:600;color:#1d1d1f;margin-bottom:2px;letter-spacing:-0.2px}
 .sf-url{font-size:13px;color:#8e8e93;margin-bottom:18px}
-.sf-code{font-size:12px;color:#8e8e93;font-family:'SF Mono',Menlo,Consolas,monospace;margin-bottom:4px}
+.sf-code{font-size:12px;color:#8e8e93;font-family:'SF Mono',Menlo,monospace;margin-bottom:4px}
 .sf-body{font-size:14px;color:#8e8e93;line-height:1.5;max-width:360px}
 .sf-body strong{color:#1d1d1f;font-weight:500}
 .sf-foot{margin-top:20px;font-size:11px;color:#c7c7cc;font-family:'SF Mono',Menlo,monospace}
+
+/* Reload button */
+.sf-reload{
+  margin-top:24px;padding:10px 28px;font-size:15px;font-family:inherit;
+  background:#007aff;color:#fff;border:none;border-radius:10px;
+  cursor:pointer;font-weight:500;letter-spacing:-0.2px;
+  transition:background 0.15s,transform 0.1s;
+}
+.sf-reload:active{background:#0062d1;transform:scale(0.97)}
+
+/* Loading spinner */
+.sf-spinner{
+  display:none;margin-top:20px;
+  width:24px;height:24px;border:2.5px solid #e5e5ea;border-top-color:#007aff;
+  border-radius:50%;animation:spin 0.8s linear infinite;
+}
+.sf-spinner.show{display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 .sf-h.glitch{animation:gl 0.25s ease}
 @keyframes gl{0%{transform:translate(0)}20%{transform:translate(-2px,1px);opacity:0.7}50%{transform:translate(2px,-1px);opacity:0.9}80%{transform:translate(-1px,1px)}100%{transform:translate(0);opacity:1}}
 .shake{animation:sk 0.35s ease}
 @keyframes sk{0%,100%{transform:translate(0)}15%{transform:translate(-3px,2px)}35%{transform:translate(3px,-2px)}55%{transform:translate(-2px,1px)}75%{transform:translate(2px,-1px)}}
 
-/* === iOS/macOS ALERT === */
+/* === iOS ALERT === */
 .alert-bg{
   display:none;position:fixed;top:0;left:0;width:100%;height:100%;
   background:rgba(0,0,0,0.32);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
@@ -61,10 +79,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
   letter-spacing:-0.1px;transition:background 0.12s;
 }
 .alert-btn:active{background:rgba(0,0,0,0.06)}
-.alert-btn+.alert-divider+.alert-btn,.alert-btn~.alert-btn{border-top:none}
 .alert-btn.bold{font-weight:600;color:#007aff}
 .alert-btn.red{font-weight:600;color:#ff3b30}
-.alert-btn.gray{font-weight:400;color:#007aff}
 .alert-btn:disabled{color:#c7c7cc;pointer-events:none}
 
 .alert-progress{padding:0 16px 14px;display:none}
@@ -73,81 +89,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
 .ap-fill{height:100%;background:#007aff;border-radius:1.5px;width:0%;transition:width 0.3s}
 .ap-text{font-size:11px;color:#8e8e93;margin-top:7px;text-align:center}
 
-.alert-cancel-area{display:none;padding:0 16px 10px}
-.alert-cancel-area.show{display:flex;justify-content:center}
-.alert-cancel-inner{border-top:0.5px solid rgba(60,60,67,0.12);width:100%;padding-top:8px;text-align:center}
-.alert-cancel-btn{
+/* Stop btn — hidden until enabled */
+.alert-stop{display:none;padding:0 16px 12px;text-align:center}
+.alert-stop.show{display:block}
+.alert-stop-btn{
   font-size:11px;font-family:inherit;color:#8e8e93;border:none;background:none;
-  cursor:pointer;padding:4px 12px;border-radius:4px;transition:background 0.12s;
+  cursor:pointer;padding:4px 12px;transition:color 0.2s;
 }
-.alert-cancel-btn:active{background:rgba(0,0,0,0.06)}
-.alert-cancel-btn:disabled{color:#d1d1d6;pointer-events:none}
+.alert-stop-btn:active{color:#636366}
+.alert-stop-btn:disabled{color:#d1d1d6;pointer-events:none}
 
-/* === REVEAL: LETTER/CARD === */
-.reveal{
-  display:none;position:fixed;top:0;left:0;width:100%;height:100%;
-  z-index:200;align-items:center;justify-content:center;padding:24px;
-  background:#f5f0e8;
-}
-.reveal.show{display:flex;animation:rvIn 1.5s ease-out}
-@keyframes rvIn{from{opacity:0}to{opacity:1}}
+/* Blocked popup */
+.blocked-box{max-width:240px}
 
-.letter{
-  background:#fffef9;border-radius:4px;max-width:380px;width:100%;
-  padding:40px 32px 36px;position:relative;
-  box-shadow:0 1px 3px rgba(0,0,0,0.06),0 8px 30px rgba(0,0,0,0.08),0 30px 60px rgba(0,0,0,0.04);
-  animation:letterIn 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s both;
+/* Reveal — same alert box, warm shift */
+.alert-box.warm{
+  background:rgba(255,252,245,0.98);
+  box-shadow:0 20px 60px rgba(180,140,40,0.15),0 0 0 0.5px rgba(180,140,40,0.1);
 }
-@keyframes letterIn{from{opacity:0;transform:translateY(20px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-
-.letter::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:4px;
-  background:linear-gradient(90deg,#d4a853,#e8c97a,#d4a853);
-}
-
-.letter-seal{
-  width:56px;height:56px;border-radius:50%;margin:0 auto 20px;
-  background:linear-gradient(135deg,#d4a853,#b8922e);
-  display:flex;align-items:center;justify-content:center;
-  font-size:24px;color:#fffef9;
-  box-shadow:0 2px 8px rgba(180,140,40,0.3);
-  animation:sealSpin 0.6s ease-out 1.2s both;
-}
-@keyframes sealSpin{from{transform:rotate(-20deg) scale(0.8);opacity:0}to{transform:rotate(0) scale(1);opacity:1}}
-
-.letter-head{
-  text-align:center;margin-bottom:20px;
-  font-size:11px;color:#b8a88a;text-transform:uppercase;letter-spacing:2px;
-  font-weight:500;
-}
-
-.letter-body{
-  font-family:'Georgia','Times New Roman',serif;
-  font-size:15px;color:#3d3529;line-height:1.85;text-align:center;
-}
-.letter-body .gold{color:#b8922e;font-weight:600;font-style:italic}
-.letter-body .sincere{color:#6b5d4d;font-style:italic}
-.letter-body .small{font-size:13px;color:#9a8b78}
-
-.letter-sig{
-  margin-top:24px;text-align:center;
-  font-family:'Georgia',serif;font-size:14px;color:#9a8b78;font-style:italic;
-}
-
-.letter-foot{
-  margin-top:20px;text-align:center;font-size:10px;color:#c4b89e;
-  cursor:pointer;display:none;
-}
-.letter-foot.show{display:block}
-.letter-foot-msg{color:#b8922e;margin-top:4px;font-size:11px}
+.warm .alert-title{color:#8b6914}
+.warm .alert-desc{color:#6b5d4d}
+.warm .alert-desc .gold{color:#b8922e;font-weight:600}
+.warm .alert-desc .sincere{color:#3d3529;font-style:italic}
+.warm .alert-btn{color:#b8922e}
 
 .confetti{position:fixed;top:-10px;z-index:201;pointer-events:none;animation:cF linear forwards}
 @keyframes cF{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
 
 @media(max-width:600px){
   .alert-box{max-width:85%}
-  .letter{padding:32px 24px 28px}
-  .letter-body{font-size:14px}
 }
 </style>
 </head>
@@ -161,6 +131,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
   <div class="sf-code" id="sfC">ERR_CONNECTION_REFUSED</div>
   <div class="sf-body" id="sfB"><strong>ryan-the-zilla.github.io</strong> heeft de verbinding geweigerd.</div>
   <div class="sf-foot" id="sfF">Foutdetails: CONNECTION_REFUSED — Poort 443</div>
+  <div class="sf-spinner" id="sfSpin"></div>
+  <button class="sf-reload" id="reloadBtn" onclick="startMorph()">Probeer opnieuw</button>
 </div>
 
 <!-- Alert 1: Confirm delete -->
@@ -172,7 +144,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
       <div class="alert-desc">
         Weet je zeker dat je <strong>Ryany</strong> uit het systeem wilt verwijderen?<br><br>
         Soort: <strong>Zus (19)</strong><br>
-        Rol: <strong id="a1Rol">Liefste zus ter wereld</strong><br><br>
+        Rol: <strong>Liefste zus ter wereld</strong><br><br>
         <span class="red">Deze actie kan niet ongedaan worden gemaakt.</span>
       </div>
     </div>
@@ -195,7 +167,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
     </div>
     <div class="alert-divider"></div>
     <div class="alert-buttons">
-      <button class="alert-btn bold" onclick="void(0)">OK</button>
+      <button class="alert-btn bold" id="a2Btn" onclick="void(0)">OK</button>
     </div>
   </div>
 </div>
@@ -215,15 +187,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
       <div class="ap-track"><div class="ap-fill" id="pbar"></div></div>
       <div class="ap-text" id="pLbl">Voorbereiden...</div>
     </div>
-    <div class="alert-cancel-area" id="panicA">
-      <div class="alert-cancel-inner">
-        <button class="alert-cancel-btn" id="stopBtn" onclick="tryStop()">Annuleren</button>
-      </div>
+    <div class="alert-stop" id="stopA">
+      <button class="alert-stop-btn" id="stopBtn" onclick="tryStop()">Annuleren</button>
     </div>
   </div>
 </div>
 
-<!-- Alert 3: Delete in progress -->
+<!-- Alert 3: Delete progress -->
 <div class="alert-bg" id="a3">
   <div class="alert-box">
     <div class="alert-top">
@@ -235,17 +205,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
       <div class="ap-track"><div class="ap-fill" id="pbar3"></div></div>
       <div class="ap-text" id="pLbl3">Voorbereiden...</div>
     </div>
-    <div class="alert-cancel-area" id="panicA3">
-      <div class="alert-cancel-inner">
-        <button class="alert-cancel-btn" id="stopBtn3" onclick="tryStop3()">Annuleren</button>
-      </div>
+    <div class="alert-stop" id="stopA3">
+      <button class="alert-stop-btn" id="stopBtn3" onclick="tryStop3()">Annuleren</button>
     </div>
   </div>
 </div>
 
-<!-- Alert 4: Stop blocked popup -->
+<!-- Alert 4: Blocked popup -->
 <div class="alert-bg" id="a4" style="z-index:60">
-  <div class="alert-box" style="max-width:250px">
+  <div class="alert-box blocked-box">
     <div class="alert-top">
       <div class="alert-icon">🚫</div>
       <div class="alert-title">Verwijdering blokkeren</div>
@@ -258,15 +226,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
   </div>
 </div>
 
-<!-- Reveal -->
-<div class="reveal" id="reveal">
-  <div class="letter">
-    <div class="letter-seal">🏆</div>
-    <div class="letter-head">Systeemnotificatie</div>
-    <div class="letter-body" id="rText"></div>
-    <div class="letter-sig">— Je broer (helaas)</div>
-    <div class="letter-foot" id="trap">tik om te sluiten
-      <div class="letter-foot-msg" id="trapMsg"></div>
+<!-- Alert 5: Reveal (same box, warm) -->
+<div class="alert-bg" id="a5">
+  <div class="alert-box warm" id="a5box">
+    <div class="alert-top">
+      <div class="alert-icon">🏆</div>
+      <div class="alert-title">Verwijdering mislukt.</div>
+      <div class="alert-desc" id="rText"></div>
+    </div>
+    <div class="alert-divider"></div>
+    <div class="alert-buttons">
+      <button class="alert-btn bold" id="trapBtn" onclick="trapClick()">OK</button>
     </div>
   </div>
 </div>
@@ -293,46 +263,76 @@ document.addEventListener('click',ia,{once:true});document.addEventListener('tou
 function showA(id){document.querySelectorAll('.alert-bg').forEach(o=>o.classList.remove('show'));document.getElementById(id).classList.add('show')}
 function hideA(id){document.getElementById(id).classList.remove('show')}
 
+// === RELOAD BUTTON → STARTS MORPH ===
+function startMorph(){
+  const btn=document.getElementById('reloadBtn');
+  const spin=document.getElementById('sfSpin');
+  btn.style.display='none';
+  spin.classList.add('show');
+  // Fake loading for 1.5s, then morph begins
+  setTimeout(runErrorMorph,1500);
+}
+
 // === ERROR MORPH ===
 async function glitch(id){const e=document.getElementById(id);e.classList.add('glitch');sGl();await new Promise(r=>setTimeout(r,250));e.classList.remove('glitch')}
 
 async function runErrorMorph(){
-  await new Promise(r=>setTimeout(r,3000));
-  await glitch('sfH');await new Promise(r=>setTimeout(r,1500));
-  await glitch('sfH');
-  document.getElementById('sfH').textContent='Deze zus kan niet worden bereikt';sMr();
-  await new Promise(r=>setTimeout(r,1200));
-  await glitch('sfH');
-  document.getElementById('sfH').textContent='Deze site kan niet worden bereikt';
-  document.getElementById('sfC').textContent='ERR_CONNECTION_REFUSED';
-  await new Promise(r=>setTimeout(r,2000));
-  document.body.classList.add('shake');sGl();await new Promise(r=>setTimeout(r,350));document.body.classList.remove('shake');
-  document.getElementById('sfC').textContent='ERR_SISTE_NOT_FOUND';document.getElementById('sfC').style.color='#ff3b30';
-  await new Promise(r=>setTimeout(r,1000));
-  document.getElementById('sfF').textContent='Foutdetails: SUBJEKT_RYANY — Verwijdering in behandeling';
-  document.getElementById('sfF').style.color='#ff3b30';sMr();
+  const t=document.getElementById('sfH'),c=document.getElementById('sfCode'),
+    b=document.getElementById('sfBody'),f=document.getElementById('sfFoot'),
+    ic=document.getElementById('sfE'),sp=document.getElementById('sfSpin');
+
+  sp.classList.remove('show');
+
+  // Still looks like error... then micro-glitch
   await new Promise(r=>setTimeout(r,1500));
-  document.getElementById('sfE').textContent='⚠️';
+  await glitch('sfH');
+  await new Promise(r=>setTimeout(r,1500));
+
+  // "site" → "zus"
+  await glitch('sfH');
+  t.textContent='Deze zus kan niet worden bereikt';sMr();
+  await new Promise(r=>setTimeout(r,1200));
+
+  // Revert — she thinks she imagined it
+  await glitch('sfH');
+  t.textContent='Deze site kan niet worden bereikt';
+  c.textContent='ERR_CONNECTION_REFUSED';
+  await new Promise(r=>setTimeout(r,2000));
+
+  // Bigger glitch
+  document.body.classList.add('shake');sGl();await new Promise(r=>setTimeout(r,350));document.body.classList.remove('shake');
+  c.textContent='ERR_SISTE_NOT_FOUND';c.style.color='#ff3b30';
+  await new Promise(r=>setTimeout(r,1000));
+
+  f.textContent='Foutdetails: SUBJEKT_RYANY — Verwijdering in behandeling';
+  f.style.color='#ff3b30';sMr();
+  await new Promise(r=>setTimeout(r,1500));
+
+  ic.textContent='⚠️';
   await new Promise(r=>setTimeout(r,800));
+
+  // Full morph
   document.body.classList.add('shake');sGl();sGl();
-  document.getElementById('sfH').textContent='Ryany verwijderen?';
-  document.getElementById('sfH').style.color='#ff3b30';document.getElementById('sfH').style.fontWeight='600';
-  document.getElementById('sfC').textContent='VERWIJDEREN_BEVESTIGEN';
-  document.getElementById('sfB').innerHTML='<strong>Ryany</strong> is gevonden in het systeem.<br>Soort: <strong>Zus (19)</strong><br>Rol: <strong>Liefste zus ter wereld</strong><br><br><span style="color:#ff3b30;font-weight:500;">Deze actie kan niet ongedaan worden gemaakt.</span>';
+  t.textContent='Ryany verwijderen?';
+  t.style.color='#ff3b30';t.style.fontWeight='600';
+  c.textContent='VERWIJDEREN_BEVESTIGEN';
+  b.innerHTML='<strong>Ryany</strong> is gevonden in het systeem.<br>Soort: <strong>Zus (19)</strong><br>Rol: <strong>Liefste zus ter wereld</strong><br><br><span style="color:#ff3b30;font-weight:500;">Deze actie kan niet ongedaan worden gemaakt.</span>';
   await new Promise(r=>setTimeout(r,400));document.body.classList.remove('shake');
   await new Promise(r=>setTimeout(r,1500));
+
   // Irritanste glitch
   document.body.classList.add('shake');sGl();
-  document.getElementById('sfB').innerHTML='<strong>Ryany</strong> is gevonden in het systeem.<br>Soort: <strong>Zus (19)</strong><br>Rol: <strong style="color:#ff3b30;">Irritanste zus ter wereld</strong><br><br><span style="color:#ff3b30;font-weight:500;">Deze actie kan niet ongedaan worden gemaakt.</span>';
+  b.innerHTML='<strong>Ryany</strong> is gevonden in het systeem.<br>Soort: <strong>Zus (19)</strong><br>Rol: <strong style="color:#ff3b30;">Irritanste zus ter wereld</strong><br><br><span style="color:#ff3b30;font-weight:500;">Deze actie kan niet ongedaan worden gemaakt.</span>';
   await new Promise(r=>setTimeout(r,700));document.body.classList.remove('shake');
-  document.getElementById('sfB').innerHTML='<strong>Ryany</strong> is gevonden in het systeem.<br>Soort: <strong>Zus (19)</strong><br>Rol: <strong>Liefste zus ter wereld</strong><br><br><span style="color:#ff3b30;font-weight:500;">Deze actie kan niet ongedaan worden gemaakt.</span>';
+  b.innerHTML='<strong>Ryany</strong> is gevonden in het systeem.<br>Soort: <strong>Zus (19)</strong><br>Rol: <strong>Liefste zus ter wereld</strong><br><br><span style="color:#ff3b30;font-weight:500;">Deze actie kan niet ongedaan worden gemaakt.</span>';
   await new Promise(r=>setTimeout(r,1200));
+
   // Buttons on error page
-  const b=document.createElement('div');
-  b.style.cssText='margin-top:24px;display:flex;gap:10px;justify-content:center;';
-  b.innerHTML='<button class="alert-btn bold" onclick="cancelDelete()" style="padding:10px 28px;font-size:14px;border:0.5px solid rgba(0,122,255,0.2);border-radius:10px;background:rgba(0,122,255,0.08);">Annuleren</button><button class="alert-btn red" onclick="startDelete()" style="padding:10px 28px;font-size:14px;border:0.5px solid rgba(255,59,48,0.2);border-radius:10px;background:rgba(255,59,48,0.08);">Verwijderen</button>';
-  document.getElementById('sfB').appendChild(b);
-  document.getElementById('sfF').style.display='none';
+  const btns=document.createElement('div');
+  btns.style.cssText='margin-top:24px;display:flex;gap:10px;justify-content:center;';
+  btns.innerHTML='<button class="alert-btn bold" onclick="cancelDelete()" style="padding:10px 28px;font-size:14px;border:0.5px solid rgba(0,122,255,0.2);border-radius:10px;background:rgba(0,122,255,0.08);">Annuleren</button><button class="alert-btn red" onclick="startDelete()" style="padding:10px 28px;font-size:14px;border:0.5px solid rgba(255,59,48,0.2);border-radius:10px;background:rgba(255,59,48,0.08);">Verwijderen</button>';
+  b.appendChild(btns);
+  f.style.display='none';
   sDlg();
 }
 
@@ -340,51 +340,62 @@ async function runErrorMorph(){
 async function cancelDelete(){
   sCan();showA('a2');
   await new Promise(r=>setTimeout(r,2000));
-  sPs();document.getElementById('a2Text').innerHTML='<strong>Ryany</strong> wordt niet verwijderd.<br><span style="color:#aeaeb2;">Goede keuze.</span>';
+  sPs();
+  document.getElementById('a2Text').innerHTML='<strong>Ryany</strong> wordt niet verwijderd.<br><span style="color:#aeaeb2;">Goede keuze.</span>';
   await new Promise(r=>setTimeout(r,1800));
-  sUn();document.getElementById('a2Text').innerHTML='<strong>Ryany</strong> wordt niet verwijderd.<br><span style="color:#aeaeb2;">...</span>';document.getElementById('a2Icon').textContent='😐';
+  sUn();
+  document.getElementById('a2Text').innerHTML='<strong>Ryany</strong> wordt niet verwijderd.<br><span style="color:#aeaeb2;">...</span>';
+  document.getElementById('a2Icon').textContent='😐';
   await new Promise(r=>setTimeout(r,1500));
-  sUn();document.getElementById('a2Text').innerHTML='<span style="color:#ff3b30;">Er gebeurt iets.</span><br><span style="color:#aeaeb2;">Je drukte op annuleren, maar...</span>';document.getElementById('a2Icon').textContent='⚠️';
+  sUn();
+  document.getElementById('a2Text').innerHTML='<span style="color:#ff3b30;">Er gebeurt iets.</span><br><span style="color:#aeaeb2;">Je drukte op annuleren, maar...</span>';
+  document.getElementById('a2Icon').textContent='⚠️';
   await new Promise(r=>setTimeout(r,1800));
-  sDlg();showA('a2b');runProgress('pbar','pLbl','stopBtn','panicA');
+  sDlg();showA('a2b');
+  runProgress('pbar','pLbl','stopBtn','stopA');
 }
 
-async function startDelete(){sDlg();showA('a3');runProgress('pbar3','pLbl3','stopBtn3','panicA3')}
+async function startDelete(){sDlg();showA('a3');runProgress('pbar3','pLbl3','stopBtn3','stopA3')}
 
 // === STOP BUTTONS ===
 let pc=0,pc3=0;
-let blockedCallback=null;
+let blockedCb=null;
 
 function tryStop(){
   sPa();pc++;
   const b=document.getElementById('stopBtn');
-  if(pc===1){showBlocked('Je mag dit proces niet stoppen.',()=>{b.textContent='Geweigerd';b.style.color='#c7c7cc'})}
-  else if(pc===2){showBlocked('Het systeem luistert niet naar je.',()=>{b.textContent='Systeem luistert niet';b.style.color='#c7c7cc'})}
+  if(pc===1) showBlocked('Je mag dit proces niet stoppen.',()=>{b.textContent='Geweigerd';b.style.color='#c7c7cc'});
+  else if(pc===2) showBlocked('Het systeem luistert niet naar je.',()=>{b.textContent='Systeem luistert niet';b.style.color='#c7c7cc'});
   else{b.disabled=true;b.textContent='Geblokkeerd';b.style.color='#d1d1d6';sFl()}
 }
 
 function tryStop3(){
   sPa();pc3++;
   const b=document.getElementById('stopBtn3');
-  if(pc3===1){showBlocked('Te laat om te stoppen.',()=>{b.textContent='Geweigerd';b.style.color='#c7c7cc'})}
-  else if(pc3===2){showBlocked('Het systeem weigert.',()=>{b.textContent='Systeem weigert';b.style.color='#c7c7cc'})}
+  if(pc3===1) showBlocked('Te laat om te stoppen.',()=>{b.textContent='Geweigerd';b.style.color='#c7c7cc'});
+  else if(pc3===2) showBlocked('Het systeem weigert.',()=>{b.textContent='Systeem weigert';b.style.color='#c7c7cc'});
   else{b.disabled=true;b.textContent='Onmogelijk';b.style.color='#d1d1d6';sFl()}
 }
 
 function showBlocked(msg,cb){
   document.getElementById('a4Text').textContent=msg;
   document.getElementById('a4').classList.add('show');
-  blockedCallback=cb;
+  blockedCb=cb;
 }
 function closeBlocked(){
   document.getElementById('a4').classList.remove('show');
-  if(blockedCallback){blockedCallback();blockedCallback=null}
+  if(blockedCb){blockedCb();blockedCb=null}
 }
 
 // === PROGRESS ===
 async function runProgress(bid,lid,sid,pid){
   const bar=document.getElementById(bid),lbl=document.getElementById(lid);
-  setTimeout(()=>{const p=document.getElementById(pid);if(p)p.classList.add('show')},2500);
+  // Show stop button after 3s delay (no ghost clicks)
+  setTimeout(()=>{
+    const p=document.getElementById(pid);
+    if(p)p.classList.add('show');
+  },3000);
+
   const steps=[
     {p:5,t:"Bestanden doorzoeken...",d:1200},
     {p:12,t:"223 gedeelde herinneringen gevonden",d:1400},
@@ -421,23 +432,28 @@ async function runProgress(bid,lid,sid,pid){
 async function showReveal(){
   document.querySelectorAll('.alert-bg').forEach(o=>o.classList.remove('show'));
   document.getElementById('safari').classList.add('hidden');
-  document.getElementById('reveal').classList.add('show');
+  document.getElementById('a5').classList.add('show');
+
   const t=document.getElementById('rText');
   t.innerHTML='Foutcode: <span class="gold">TE_LIEF_OM_TE_VERWIJDEREN</span>';
   sRv();spawnConfetti(30);
   await new Promise(r=>setTimeout(r,2200));
+
   t.innerHTML+='<br><br><span class="sincere">Het systeem probeerde het. Echt.</span>';
   await new Promise(r=>setTimeout(r,1800));
+
   t.innerHTML+='<br>Maar <span class="gold">liefste zus ter wereld</span> is niet zomaar te verwijderen.';
   spawnConfetti(15);
   await new Promise(r=>setTimeout(r,2200));
+
   t.innerHTML+='<br><br><span class="sincere">En tussen twee haakjes — sorry dat ik je soms pest.</span>';
   await new Promise(r=>setTimeout(r,1500));
+
   t.innerHTML+='<br><span class="sincere">Je verdient het. Maar toch. Sorry.</span>';
   await new Promise(r=>setTimeout(r,1800));
+
   t.innerHTML+='<br><br>Verwijdering: <span class="gold">permanent geblokkeerd</span>.';
   spawnConfetti(20);
-  setTimeout(()=>{document.getElementById('trap').classList.add('show')},1200);
 }
 
 function spawnConfetti(n){
@@ -448,19 +464,18 @@ function spawnConfetti(n){
 const trapMsgs=[
   "Beschermd. Sinds geboorte.",
   "Verwijderen onmogelijk.",
-  "Zelfs de politie kan dit niet.",
   "Ryany blijft. Deal ermee.",
   "Fout: te belangrijk.",
   "Agent-status: beschermd.",
+  "Zelfs de politie kan dit niet.",
 ];
 let ti=0;
-document.getElementById('reveal').addEventListener('click',()=>{
-  if(!document.getElementById('trap').classList.contains('show'))return;
-  document.getElementById('trapMsg').textContent='→ '+trapMsgs[ti%trapMsgs.length];ti++;sTr();spawnConfetti(5);
-});
-
-// BOOT
-runErrorMorph();
+function trapClick(){
+  const btn=document.getElementById('trapBtn');
+  btn.textContent=trapMsgs[ti%trapMsgs.length];
+  btn.style.fontSize='11px';
+  ti++;sTr();spawnConfetti(6);
+}
 </script>
 </body>
 </html>
