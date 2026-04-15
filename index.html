@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ryany — Bestand verwijderen</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0078d4;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 10;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .overlay.show { display: flex; }
+
+  /* Windows dialog */
+  .dialog {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+    max-width: 440px;
+    width: 90%;
+    overflow: hidden;
+    animation: popIn 0.2s ease-out;
+  }
+  @keyframes popIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .dialog-header {
+    padding: 16px 20px 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .dialog-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .dialog-text {
+    flex: 1;
+  }
+  .dialog-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+  }
+  .dialog-desc {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.6;
+  }
+  .dialog-desc .warn { color: #c42b1c; font-weight: 600; }
+
+  .dialog-buttons {
+    padding: 12px 20px 16px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    padding: 7px 20px;
+    font-size: 13px;
+    font-family: 'Segoe UI', sans-serif;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    background: #fff;
+    color: #333;
+    transition: background 0.15s;
+  }
+  .btn:hover { background: #f0f0f0; }
+  .btn-primary {
+    background: #0078d4;
+    color: #fff;
+    border-color: #0078d4;
+  }
+  .btn-primary:hover { background: #006cbd; }
+  .btn-danger {
+    background: #c42b1c;
+    color: #fff;
+    border-color: #c42b1c;
+  }
+  .btn-danger:hover { background: #b4271a; }
+
+  /* Phase 2: Confirm */
+  .confirm { display: none; }
+  .confirm.show { display: block; }
+  .init { display: block; }
+  .init.hide { display: none; }
+
+  /* Progress bar */
+  .progress-wrap {
+    padding: 0 20px 16px;
+    display: none;
+  }
+  .progress-wrap.show { display: block; }
+  .progress-outer {
+    width: 100%;
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-inner {
+    height: 100%;
+    background: #0078d4;
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.3s;
+  }
+  .progress-label {
+    font-size: 12px;
+    color: #888;
+    margin-top: 8px;
+  }
+
+  /* Phase 3: Panic buttons */
+  .panic-buttons {
+    display: none;
+    padding: 0 20px 12px;
+  }
+  .panic-buttons.show { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* Phase 4: True reveal */
+  .reveal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #0a0a0a;
+    z-index: 100;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+  }
+  .reveal-overlay.show { display: flex; animation: fadeBlack 0.8s ease-out; }
+  @keyframes fadeBlack { from { opacity: 0; } to { opacity: 1; } }
+
+  .rv-emoji { font-size: 60px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .rv-title {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 2em;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .rv-sub {
+    color: #888;
+    font-size: 1.05em;
+    line-height: 1.7;
+    max-width: 400px;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .rv-sub .acc { color: #ffd700; font-weight: 600; }
+  .rv-footer { margin-top: 25px; color: #444; font-size: 0.9em; }
+  .rv-trap { margin-top: 20px; color: #555; font-size: 0.85em; display: none; cursor: pointer; }
+  .rv-trap.show { display: block; }
+  .rv-trap-msg { color: #ff4444; margin-top: 8px; }
+
+  .confetti { position: fixed; top: -10px; z-index: 101; pointer-events: none; animation: cFall linear forwards; }
+  @keyframes cFall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+
+  @media (max-width: 600px) {
+    .dialog { max-width: 95%; }
+    .rv-title { font-size: 1.5em; }
+  }
+</style>
+</head>
+<body>
+
+<div class="overlay show" id="overlay">
+  <div class="dialog">
+
+    <!-- Phase 1: Initial -->
+    <div class="init" id="init">
+      <div class="dialog-header">
+        <div class="dialog-icon">🗑️</div>
+        <div class="dialog-text">
+          <div class="dialog-title">Bestand verwijderen</div>
+          <div class="dialog-desc">
+            Weet je zeker dat je <strong>Ryany</strong> uit de familie wilt verwijderen?<br><br>
+            Type: <strong>Zus (19)</strong><br>
+            Grootte: <strong>Onmeetbaar</strong><br>
+            Laatst geopend: <strong>Vandaag</strong>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-buttons">
+        <button class="btn" onclick="cancelAttempt()">Annuleren</button>
+        <button class="btn btn-danger" onclick="startDelete()">Verwijderen</button>
+      </div>
+    </div>
+
+    <!-- Phase 2: Confirm -->
+    <div class="confirm" id="confirm">
+      <div class="dialog-header">
+        <div class="dialog-icon">⚠️</div>
+        <div class="dialog-text">
+          <div class="dialog-title" id="confirmTitle">Weet je het zeker?</div>
+          <div class="dialog-desc" id="confirmDesc">
+            Je staat op het punt <strong>Ryany</strong> permanent te verwijderen.<br>
+            <span class="warn">Deze actie kan niet ongedaan worden gemaakt.</span>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-buttons" id="confirmBtns">
+        <button class="btn" onclick="cancelAttempt()">Nee, bewaren!</button>
+        <button class="btn btn-danger" id="delBtn2" onclick="confirmDelete()">Ja, verwijderen</button>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-outer"><div class="progress-inner" id="pbar"></div></div>
+      <div class="progress-label" id="progressLabel">Bezig met verwijderen...</div>
+    </div>
+
+    <!-- Panic phase -->
+    <div class="panic-buttons" id="panicBtns">
+      <button class="btn btn-primary" id="stopBtn" onclick="tryStop()">⏹ Stoppen</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Reveal -->
+<div class="reveal-overlay" id="reveal">
+  <div class="rv-emoji">🏆</div>
+  <div class="rv-title">Verwijdering mislukt.</div>
+  <div class="rv-sub">
+    Foutcode: <strong>TE_LIEF_OM_TE_VERWIJDEREN</strong><br><br>
+    Systeem weigert. <span class="acc">Liefste zus ter wereld</span> is beschermd bestand.<br>
+    Verwijdering is permanent geblokkeerd.
+  </div>
+  <div class="rv-footer">— RyanOS (je broer)</div>
+  <div class="rv-trap" id="trap">klik ergens om te sluiten
+    <div class="rv-trap-msg" id="trapMsg"></div>
+  </div>
+</div>
+
+<script>
+let phase = 0;
+let deleting = false;
+let cancelFails = 0;
+
+const confirmTexts = [
+  {
+    title: "Weet je het zeker?",
+    desc: 'Je staat op het punt <strong>Ryany</strong> permanent te verwijderen.<br><span class="warn">Deze actie kan niet ongedaan worden gemaakt.</span>'
+  },
+  {
+    title: "Nog steeds zeker?",
+    desc: 'Dit is je <strong>eigen zus</strong> he. Weet je wat je doet?<br><span class="warn">De familie zal dit niet leuk vinden.</span>'
+  },
+  {
+    title: "Laatste kans.",
+    desc: 'Oké. Laatste waarschuwing. <strong>Ryany</strong> is de liefste zus die je hebt.<br><span class="warn">En je hebt er maar één.</span>'
+  }
+];
+
+const panicMsgs = [
+  "Je drukt op stoppen maar er gebeurt niets...",
+  "Stoppen mislukt. Proces weigert te stoppen.",
+  "ERROR: Cannot delete. Attachment too strong.",
+  "Ryany.schrapen() → Access Denied",
+  "Systeem: NEE."
+];
+
+const progressSteps = [
+  { p: 5, t: "Bestanden scannen..." },
+  { p: 12, t: "Gedeelde herinneringen doorzoeken..." },
+  { p: 20, t: "223 herinneringen gevonden. Verwijderen..." },
+  { p: 28, t: "Fout: herinnering 'kerst 2019' geweigerd." },
+  { p: 35, t: "Fout: herinnering 'lachen om niks' vergrendeld." },
+  { p: 42, t: "Meerdere bestanden weigeren verwijderd te worden." },
+  { p: 50, t: "Humor.data kan niet geleegd worden." },
+  { p: 58, t: "Loyaliteit.lock → Access denied." },
+  { p: 65, t: "Sarcasme.cache → schrijfbeveiligd." },
+  { p: 72, t: "WAARSCHUWING: systeem verzet zich." },
+  { p: 80, t: "KRITIEK: liefde.quota overschrijdt veiligheidslimiet." },
+  { p: 88, t: "Onmogelijk te verwijderen. Binding te sterk." },
+  { p: 95, t: "Operation FAILED: TE_LIEF_OM_TE_VERWIJDEREN" },
+  { p: 100, t: "Verwijdering afgebroken." },
+];
+
+const trapMsgs = [
+  "Fout: liefste zus privileges zijn permanent.",
+  "Verwijderen? Nee. Nooit.",
+  "Ryany blijft. Deal ermee.",
+  "Zelfs admin kan dit niet verwijderen.",
+  "Beschermd bestand. Sinds geboorte.",
+];
+
+let trapIdx = 0;
+
+function cancelAttempt() {
+  cancelFails++;
+  if (cancelFails === 1) {
+    // "Annuleren" doesn't work — goes to confirm instead
+    phase = 1;
+    document.getElementById('init').classList.add('hide');
+    document.getElementById('confirm').classList.add('show');
+    updateConfirm();
+  } else {
+    // Cancel keeps "failing"
+    startDelete();
+  }
+}
+
+function updateConfirm() {
+  const idx = Math.min(phase - 1, confirmTexts.length - 1);
+  document.getElementById('confirmTitle').textContent = confirmTexts[idx].title;
+  document.getElementById('confirmDesc').innerHTML = confirmTexts[idx].desc;
+}
+
+function confirmDelete() {
+  phase++;
+  if (phase <= 3) {
+    updateConfirm();
+  }
+  if (phase >= 3) {
+    startDelete();
+  }
+}
+
+function startDelete() {
+  deleting = true;
+  document.getElementById('init').classList.add('hide');
+  document.getElementById('confirm').classList.remove('show');
+  document.getElementById('progressWrap').classList.add('show');
+  document.getElementById('panicBtns').classList.add('show');
+  runProgress();
+}
+
+let panicClicks = 0;
+function tryStop() {
+  const btn = document.getElementById('stopBtn');
+  const label = document.getElementById('progressLabel');
+  panicClicks++;
+  if (panicClicks <= panicMsgs.length) {
+    btn.textContent = "⏹ " + panicMsgs[panicClicks - 1];
+    btn.style.fontSize = "11px";
+  }
+  if (panicClicks >= 3) {
+    btn.disabled = true;
+    btn.textContent = "⏹ Geweigerd";
+    btn.style.opacity = "0.4";
+  }
+}
+
+async function runProgress() {
+  const bar = document.getElementById('pbar');
+  const label = document.getElementById('progressLabel');
+
+  for (const s of progressSteps) {
+    bar.style.width = s.p + '%';
+    label.textContent = s.t;
+    if (s.p > 60) bar.style.background = '#c42b1c';
+    if (s.p > 85) bar.style.background = '#ff4444';
+    await new Promise(r => setTimeout(r, 800 + Math.random()*600));
+  }
+
+  await new Promise(r => setTimeout(r, 800));
+  showReveal();
+}
+
+function showReveal() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('reveal').classList.add('show');
+  spawnConfetti(50);
+  setTimeout(() => {
+    document.getElementById('trap').classList.add('show');
+  }, 2000);
+}
+
+function spawnConfetti(n) {
+  const colors = ['#ffd700','#0078d4','#fff','#ff4444','#0f0'];
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      const s = 4 + Math.random()*6;
+      c.style.left = Math.random()*100+'vw';
+      c.style.width = s+'px'; c.style.height = s+'px';
+      c.style.background = colors[Math.floor(Math.random()*colors.length)];
+      c.style.borderRadius = Math.random()>0.5?'50%':'2px';
+      c.style.animationDuration = (2+Math.random()*3)+'s';
+      c.style.opacity = 0.4+Math.random()*0.6;
+      document.body.appendChild(c);
+      setTimeout(()=>c.remove(),5000);
+    }, i*40);
+  }
+}
+
+document.getElementById('reveal').addEventListener('click', () => {
+  const trap = document.getElementById('trap');
+  if (!trap.classList.contains('show')) return;
+  document.getElementById('trapMsg').textContent = '> ' + trapMsgs[trapIdx % trapMsgs.length];
+  trapIdx++;
+  spawnConfetti(8);
+});
+document.addEventListener('keydown', (e) => {
+  const trap = document.getElementById('trap');
+  if (!trap.classList.contains('show')) return;
+  document.getElementById('trapMsg').textContent = '> ' + trapMsgs[trapIdx % trapMsgs.length];
+  trapIdx++;
+  spawnConfetti(8);
+});
+</script>
+</body>
+</html>
