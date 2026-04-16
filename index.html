@@ -486,8 +486,8 @@ function trapClick(){
   const btn=document.getElementById('trapBtn');
   if(ti===0){
     ti++;
-    const faah=document.getElementById('faahSnd');
-    if(faah){faah.volume=1;faah.currentTime=0;faah.play().catch(()=>{})}
+    // Fresh audio for guaranteed playback
+    try{const s=document.querySelector('#faahSnd source');const a=new Audio(s?s.src:'');a.volume=1;a.play().catch(()=>{})}catch(e){}
     document.body.classList.add('shake');sGl();sGl();
     const ov=document.createElement('div');
     ov.id='photoBomb';
